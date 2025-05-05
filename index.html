@@ -244,6 +244,7 @@
     function playHover() {
       if (!soundEnabled) return;
       const snd = document.getElementById('hoverSound');
+      snd.volume = 0.5; // Set volume to 50%
       snd.currentTime = 0;
       snd.play();
     }

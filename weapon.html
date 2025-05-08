@@ -9,8 +9,19 @@
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: #0c1014;
       color: #00ffc8;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://i.imgur.com/TytkDtb.png') no-repeat center center fixed;
+      background-size: cover;
+      filter: blur(2px);
+      z-index: -1;
     }
 
     .wrapper {
@@ -19,10 +30,9 @@
       overflow: hidden;
     }
 
-    /* Sidebar Weapon Category List */
     .sidebar {
       width: 14%;
-      background: #11161b;
+      background: rgba(17, 22, 27, 0.8);
       padding: 20px 10px;
       border-right: 2px solid #00ffc8;
     }
@@ -45,10 +55,9 @@
       margin-right: 10px;
     }
 
-    /* Weapon List Panel */
     .weapon-list {
       width: 22%;
-      background: #1a1f26;
+      background: rgba(26, 31, 38, 0.8);
       padding: 20px;
       overflow-y: auto;
     }
@@ -76,10 +85,9 @@
       background: #00ffc810;
     }
 
-    /* Center Stats Panel */
     .weapon-stats {
       width: 36%;
-      background: #151a1f;
+      background: rgba(21, 26, 31, 0.85);
       padding: 30px;
       display: flex;
       flex-direction: column;
@@ -103,10 +111,17 @@
     }
 
     .stat-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bar-bg {
       background: #0a0d0f;
       border: 1px solid #00ffc8;
       height: 8px;
       border-radius: 4px;
+      flex: 1;
       overflow: hidden;
     }
 
@@ -117,16 +132,21 @@
       transition: width 0.3s ease;
     }
 
+    .stat-val {
+      width: 40px;
+      text-align: right;
+      font-size: 0.85rem;
+    }
+
     .extra-attributes {
       margin-top: 20px;
       font-size: 0.9rem;
       color: #bffef3;
     }
 
-    /* Weapon Preview Panel */
     .weapon-display {
       width: 28%;
-      background: #0e1216;
+      background: rgba(14, 18, 22, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -148,7 +168,7 @@
 <body>
 
 <div class="wrapper">
-  <!-- Category Sidebar -->
+  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">ALL</div>
     <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">RIFLE</div>
@@ -158,7 +178,7 @@
     <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">SR</div>
   </div>
 
-  <!-- Weapon Selection List -->
+  <!-- Weapon List -->
   <div class="weapon-list">
     <div class="weapon-button active" onclick="selectWeapon('AK47', event)">
       <img src="https://i.imgur.com/riKak4v.png" alt="">
@@ -179,24 +199,40 @@
     <h2 id="weaponName">AK47 Assault Rifle</h2>
     <div class="stat-block">
       <label>Damage</label>
-      <div class="stat-bar"><div id="barDamage" class="stat-fill"></div></div>
+      <div class="stat-bar">
+        <div class="bar-bg"><div id="barDamage" class="stat-fill"></div></div>
+        <div class="stat-val" id="statDamage">80</div>
+      </div>
     </div>
     <div class="stat-block">
       <label>Range</label>
-      <div class="stat-bar"><div id="barRange" class="stat-fill"></div></div>
+      <div class="stat-bar">
+        <div class="bar-bg"><div id="barRange" class="stat-fill"></div></div>
+        <div class="stat-val" id="statRange">72</div>
+      </div>
     </div>
     <div class="stat-block">
       <label>Rate of Fire</label>
-      <div class="stat-bar"><div id="barROF" class="stat-fill"></div></div>
+      <div class="stat-bar">
+        <div class="bar-bg"><div id="barROF" class="stat-fill"></div></div>
+        <div class="stat-val" id="statROF">60</div>
+      </div>
     </div>
     <div class="stat-block">
       <label>Magazine</label>
-      <div class="stat-bar"><div id="barMag" class="stat-fill"></div></div>
+      <div class="stat-bar">
+        <div class="bar-bg"><div id="barMag" class="stat-fill"></div></div>
+        <div class="stat-val" id="statMag">30</div>
+      </div>
     </div>
     <div class="stat-block">
       <label>Accuracy</label>
-      <div class="stat-bar"><div id="barAcc" class="stat-fill"></div></div>
+      <div class="stat-bar">
+        <div class="bar-bg"><div id="barAcc" class="stat-fill"></div></div>
+        <div class="stat-val" id="statAcc">65</div>
+      </div>
     </div>
+
     <div class="extra-attributes">
       <p><strong>Mode:</strong> <span id="statMode">Auto</span></p>
       <p><strong>Velocity:</strong> <span id="statVel">700 m/s</span></p>
@@ -204,7 +240,7 @@
     </div>
   </div>
 
-  <!-- Weapon Image -->
+  <!-- Weapon Preview -->
   <div class="weapon-display">
     <img id="weaponImg" src="https://i.imgur.com/riKak4v.png" alt="Weapon">
   </div>
@@ -258,6 +294,13 @@
     document.getElementById("barROF").style.width = w.rof + "%";
     document.getElementById("barMag").style.width = w.mag * 3 + "%";
     document.getElementById("barAcc").style.width = w.acc + "%";
+
+    document.getElementById("statDamage").textContent = w.damage;
+    document.getElementById("statRange").textContent = w.range;
+    document.getElementById("statROF").textContent = w.rof;
+    document.getElementById("statMag").textContent = w.mag;
+    document.getElementById("statAcc").textContent = w.acc;
+
     document.getElementById("statMode").textContent = w.mode;
     document.getElementById("statVel").textContent = w.velocity;
     document.getElementById("statDesc").textContent = w.desc;
@@ -267,8 +310,11 @@
     event.currentTarget.classList.add('active');
   }
 
-  // Initialize
-  window.onload = () => selectWeapon('AK47', { currentTarget: document.querySelector('.weapon-button') });
+  // Init
+  window.onload = () => {
+    const first = document.querySelector('.weapon-button');
+    selectWeapon('AK47', { currentTarget: first });
+  };
 </script>
 
 </body>

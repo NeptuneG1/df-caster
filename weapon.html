@@ -38,21 +38,23 @@
     }
 
     .sidebar-icon {
-      display: flex;
-      align-items: center;
-      margin: 20px 0;
-      opacity: 0.6;
+      text-align: center;
+      margin: 25px 0;
       cursor: pointer;
       transition: 0.3s;
+      font-size: 0.7rem;
+      opacity: 0.6;
     }
-
+    
     .sidebar-icon:hover {
       opacity: 1;
     }
-
+    
     .sidebar-icon img {
-      width: 24px;
-      margin-right: 10px;
+      display: block;
+      width: 40px;
+      margin: 8px auto 0;
+      filter: drop-shadow(0 0 4px #00ffc8);
     }
 
     .weapon-list {
@@ -63,22 +65,23 @@
     }
 
     .weapon-button {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      text-align: center;
       background: #000;
       color: #00ffc8;
       border: 2px solid #00ffc8;
       border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 10px;
-      font-size: 0.9rem;
+      padding: 12px 8px;
+      margin-bottom: 12px;
+      font-size: 0.7rem;
       cursor: pointer;
       transition: 0.3s;
     }
-
+    
     .weapon-button img {
-      width: 50px;
+      display: block;
+      width: 60px;
+      margin: 0 auto 6px;
+      filter: drop-shadow(0 0 4px #00ffc8);
     }
 
     .weapon-button:hover, .weapon-button.active {
@@ -169,31 +172,48 @@
 
 <div class="wrapper">
   <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">ALL</div>
-    <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">RIFLE</div>
-    <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">SMG</div>
-    <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">SHOTGUN</div>
-    <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">MR</div>
-    <div class="sidebar-icon"><img src="https://i.imgur.com/NMzQ7XP.png" alt="">SR</div>
+ <div class="sidebar">
+  <div class="sidebar-icon">
+    ALL
+    <img src="https://i.imgur.com/NMzQ7XP.png" alt="All">
   </div>
+  <div class="sidebar-icon">
+    RIFLE
+    <img src="https://i.imgur.com/NMzQ7XP.png" alt="Rifle">
+  </div>
+  <div class="sidebar-icon">
+    SMG
+    <img src="https://i.imgur.com/NMzQ7XP.png" alt="SMG">
+  </div>
+  <div class="sidebar-icon">
+    SHOTGUN
+    <img src="https://i.imgur.com/NMzQ7XP.png" alt="Shotgun">
+  </div>
+  <div class="sidebar-icon">
+    MR
+    <img src="https://i.imgur.com/NMzQ7XP.png" alt="MR">
+  </div>
+  <div class="sidebar-icon">
+    SR
+    <img src="https://i.imgur.com/NMzQ7XP.png" alt="SR">
+  </div>
+</div>
 
   <!-- Weapon List -->
   <div class="weapon-list">
-    <div class="weapon-button active" onclick="selectWeapon('AK47', event)">
-      <img src="https://i.imgur.com/riKak4v.png" alt="">
-      <span>AK47 Assault Rifle</span>
-    </div>
-    <div class="weapon-button" onclick="selectWeapon('M1887', event)">
-      <img src="https://i.imgur.com/G4XKcXm.png" alt="">
-      <span>M1887 Shotgun</span>
-    </div>
-    <div class="weapon-button" onclick="selectWeapon('Plasma', event)">
-      <img src="https://i.imgur.com/svVpglZ.png" alt="">
-      <span>Plasma Gun</span>
-    </div>
+  <div class="weapon-button active" onclick="selectWeapon('AK47', event)">
+    AK47 Assault Rifle
+    <img src="https://i.imgur.com/riKak4v.png" alt="AK47">
   </div>
-
+  <div class="weapon-button" onclick="selectWeapon('M1887', event)">
+    M1887 Shotgun
+    <img src="https://i.imgur.com/G4XKcXm.png" alt="M1887">
+  </div>
+  <div class="weapon-button" onclick="selectWeapon('Plasma', event)">
+    Plasma Gun
+    <img src="https://i.imgur.com/svVpglZ.png" alt="Plasma">
+  </div>
+</div>
   <!-- Weapon Stats -->
   <div class="weapon-stats">
     <h2 id="weaponName">AK47 Assault Rifle</h2>

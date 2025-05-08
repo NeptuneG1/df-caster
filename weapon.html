@@ -21,8 +21,8 @@
     }
 
     .weapon-list {
-      width: 20%;
-      background: rgba(0, 0, 0, 0.7);
+      width: 22%;
+      background: rgba(0, 0, 0, 0.8);
       border-right: 2px solid #00ffc8;
       padding: 20px;
       overflow-y: auto;
@@ -31,21 +31,33 @@
     .weapon-list h3 {
       color: #00ffc8;
       margin-bottom: 15px;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
 
     .weapon-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #00ffc8;
-      background: rgba(0, 255, 200, 0.05);
+      margin-bottom: 12px;
+      background: #000;
+      border: 2px solid #00ffc8;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 255, 200, 0.3);
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .weapon-item img {
+      width: 40px;
+      height: auto;
+      filter: drop-shadow(0 0 4px #00ffc8);
     }
 
     .weapon-item:hover,
     .weapon-item.active {
-      background: rgba(0, 255, 200, 0.2);
+      background: rgba(0, 255, 200, 0.15);
+      transform: scale(1.03);
     }
 
     .weapon-details {
@@ -79,7 +91,7 @@
     }
 
     .weapon-image {
-      width: 45%;
+      width: 43%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -87,9 +99,30 @@
     }
 
     .weapon-image img {
-      max-width: 100%;
-      max-height: 80%;
-      filter: drop-shadow(0 0 12px #00ffc8);
+      max-width: 90%;
+      max-height: 85%;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px #00ffc8);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @media (max-width: 768px) {
+      .main-wrapper {
+        flex-direction: column;
+      }
+
+      .weapon-list, .weapon-details, .weapon-image {
+        width: 100%;
+        height: auto;
+      }
+
+      .weapon-image img {
+        max-height: 300px;
+      }
     }
   </style>
 </head>
@@ -99,9 +132,18 @@
   <!-- Left: Weapon List -->
   <div class="weapon-list">
     <h3>PRIMARY WEAPONS</h3>
-    <div class="weapon-item active" onclick="selectWeapon('AK47')">AK47 Assault Rifle</div>
-    <div class="weapon-item" onclick="selectWeapon('M1887')">M1887 Shotgun</div>
-    <div class="weapon-item" onclick="selectWeapon('Plasma')">Plasma Gun</div>
+    <div class="weapon-item active" onclick="selectWeapon('AK47', event)">
+      <img src="https://i.imgur.com/riKak4v.png" alt="AK47">
+      <span>AK47 Assault Rifle</span>
+    </div>
+    <div class="weapon-item" onclick="selectWeapon('M1887', event)">
+      <img src="https://i.imgur.com/G4XKcXm.png" alt="M1887">
+      <span>M1887 Shotgun</span>
+    </div>
+    <div class="weapon-item" onclick="selectWeapon('Plasma', event)">
+      <img src="https://i.imgur.com/svVpglZ.png" alt="Plasma Gun">
+      <span>Plasma Gun</span>
+    </div>
   </div>
 
   <!-- Middle: Stats -->
@@ -161,7 +203,7 @@
     }
   };
 
-  function selectWeapon(key) {
+  function selectWeapon(key, event) {
     const w = weapons[key];
     document.getElementById("weaponName").textContent = w.name;
     document.getElementById("statDamage").textContent = w.damage;
@@ -174,7 +216,7 @@
     document.getElementById("weaponImg").src = w.image;
 
     document.querySelectorAll('.weapon-item').forEach(el => el.classList.remove('active'));
-    event.target.classList.add('active');
+    event.currentTarget.classList.add('active');
   }
 </script>
 

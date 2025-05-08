@@ -3,67 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Delta Force Weapon Viewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <title>Delta Force - Weapon Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
       background: url('https://i.imgur.com/TytkDtb.png') no-repeat center center fixed;
       background-size: cover;
-      color: #f0f0f0;
+      color: #00ffc8;
     }
 
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: 220px;
-      height: 100vh;
-      background: linear-gradient(to bottom, #0f0f14, #1a1b23);
-      padding: 20px;
-      box-sizing: border-box;
-      border-right: 2px solid #ffbd59;
-      box-shadow: 2px 0 10px rgba(255, 189, 89, 0.2);
+    header {
+      text-align: center;
+      padding: 30px 20px 10px;
     }
 
-    .sidebar h2 {
-      color: #ffbd59;
-      margin-bottom: 20px;
+    header img {
+      max-width: 140px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 10px #00ffc8);
     }
 
-    .sidebar button {
-      display: block;
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 10px;
-      background: #1f1f1f;
-      border: 1px solid #ffbd59;
-      color: #ffbd59;
-      font-size: 14px;
-      cursor: pointer;
+    header h1 {
+      font-size: 3rem;
+      color: #00ffc8;
+      letter-spacing: 4px;
+      text-shadow: 0 0 10px #00ffc8, 0 0 20px #007060;
     }
 
-    .sidebar button:hover {
-      background: #ffbd59;
-      color: #000;
-    }
-
-    .main {
-      margin-left: 240px;
+    .weapon-wrapper {
       display: flex;
-      align-items: center;
       justify-content: center;
-      height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 40px 20px;
+      gap: 40px;
     }
 
     .weapon-details {
-      width: 420px;
-      background: rgba(15, 15, 20, 0.92);
+      background: rgba(0, 255, 200, 0.05);
+      border-left: 4px solid #00ffc8;
+      box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
       padding: 30px;
-      border-left: 4px solid #ffbd59;
-      box-shadow: 0 0 20px #ffbd59;
+      border-radius: 10px;
+      backdrop-filter: blur(6px);
+      width: 400px;
+      max-width: 90%;
       opacity: 0;
       transform: translateX(-40px);
       transition: all 0.4s ease;
@@ -75,37 +61,70 @@
     }
 
     .weapon-details h2 {
-      margin: 0 0 15px;
-      color: #ffbd59;
+      color: #00ffc8;
+      margin-top: 0;
       font-size: 28px;
     }
 
     .weapon-details p {
-      margin: 8px 0;
+      color: #bffef3;
+      margin: 10px 0;
       font-size: 15px;
     }
 
     .weapon-image {
-      margin-left: 60px;
-      max-width: 400px;
+      max-width: 360px;
       animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px #00ffc8);
     }
 
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
+
+    .weapon-selector {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .weapon-selector button {
+      background: #000;
+      border: 2px solid #00ffc8;
+      color: #00ffc8;
+      padding: 10px 20px;
+      margin: 10px 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .weapon-selector button:hover {
+      background: #00ffc8;
+      color: #000;
+    }
+
+    @media (max-width: 768px) {
+      .weapon-wrapper {
+        flex-direction: column;
+      }
+
+      .weapon-image {
+        margin-top: 30px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="sidebar">
-  <h2>Weapons</h2>
-  <button onclick="selectWeapon('AK47')">AK47</button>
-  <button onclick="selectWeapon('M1887')">M1887</button>
-</div>
+<header>
+  <img src="https://i.imgur.com/LtMzKj2.png" alt="Delta Force Logo">
+  <h1>Weapon Viewer</h1>
+</header>
 
-<div class="main">
+<div class="weapon-wrapper">
   <div id="detailsPanel" class="weapon-details">
     <h2 id="weaponName">Weapon Name</h2>
     <p><strong>Type:</strong> <span id="weaponType">-</span></p>
@@ -118,9 +137,15 @@
   <img id="weaponImg" class="weapon-image" src="https://i.imgur.com/riKak4v.png" alt="Weapon Image">
 </div>
 
+<div class="weapon-selector">
+  <button onclick="selectWeapon('AK47')">AK47</button>
+  <button onclick="selectWeapon('M1887')">M1887</button>
+  <button onclick="selectWeapon('Plasma Gun')">Plasma Gun</button>
+</div>
+
 <script>
   const weapons = {
-    AK47: {
+    "AK47": {
       name: "AK47",
       type: "Assault Rifle",
       damage: 32,
@@ -130,7 +155,7 @@
       image_url: "https://i.imgur.com/riKak4v.png",
       description: "A powerful assault rifle with high damage output but moderate recoil."
     },
-    M1887: {
+    "M1887": {
       name: "M1887",
       type: "Shotgun",
       damage: 100,
@@ -139,6 +164,16 @@
       magazine_size: 2,
       image_url: "https://i.imgur.com/G4XKcXm.png",
       description: "Devastating close-range shotgun with high burst potential."
+    },
+    "Plasma Gun": {
+      name: "Plasma Gun",
+      type: "Energy Weapon",
+      damage: 44,
+      rate_of_fire: 70,
+      range: 90,
+      magazine_size: 25,
+      image_url: "https://i.imgur.com/svVpglZ.png",
+      description: "A futuristic energy weapon with piercing plasma shots and rapid fire capability."
     }
   };
 
@@ -158,8 +193,8 @@
     setTimeout(() => panel.classList.add("active"), 50);
   }
 
-  // Load default
-  selectWeapon('AK47');
+  // Initialize first weapon
+  selectWeapon("AK47");
 </script>
 
 </body>

@@ -35,6 +35,9 @@
       background: rgba(17, 22, 27, 0.8);
       padding: 20px 10px;
       border-right: 2px solid #00ffc8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .sidebar-icon {
@@ -45,11 +48,11 @@
       font-size: 0.7rem;
       opacity: 0.6;
     }
-    
+
     .sidebar-icon:hover {
       opacity: 1;
     }
-    
+
     .sidebar-icon img {
       display: block;
       width: 40px;
@@ -62,6 +65,9 @@
       background: rgba(26, 31, 38, 0.8);
       padding: 20px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .weapon-button {
@@ -76,7 +82,7 @@
       cursor: pointer;
       transition: 0.3s;
     }
-    
+
     .weapon-button img {
       display: block;
       width: 60px;
@@ -88,18 +94,31 @@
       background: #00ffc810;
     }
 
-    .weapon-stats {
-      width: 36%;
-      background: rgba(21, 26, 31, 0.85);
-      padding: 30px;
+    .weapon-display-panel {
+      width: 64%;
       display: flex;
       flex-direction: column;
-      border-right: 2px solid #00ffc8;
+      align-items: center;
+      background: rgba(14, 18, 22, 0.85);
+      padding: 30px;
+    }
+
+    .weapon-display-panel img {
+      max-width: 500px;
+      max-height: 300px;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px #00ffc8);
+    }
+
+    .weapon-stats {
+      width: 100%;
+      max-width: 700px;
+      margin-top: 30px;
     }
 
     .weapon-stats h2 {
       font-size: 1.6rem;
-      margin: 0 0 20px;
+      margin-bottom: 20px;
     }
 
     .stat-block {
@@ -147,24 +166,38 @@
       color: #bffef3;
     }
 
-    .weapon-display {
-      width: 28%;
-      background: rgba(14, 18, 22, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .weapon-display img {
-      max-width: 90%;
-      max-height: 80%;
-      animation: float 3s ease-in-out infinite;
-      filter: drop-shadow(0 0 10px #00ffc8);
-    }
-
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 768px) {
+      .wrapper {
+        flex-direction: column;
+      }
+
+      .sidebar, .weapon-list {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+        overflow-x: auto;
+        padding: 10px;
+        justify-content: center;
+      }
+
+      .weapon-display-panel {
+        width: 100%;
+        padding: 20px;
+      }
+
+      .weapon-display-panel img {
+        max-width: 90%;
+        max-height: 200px;
+      }
+
+      .weapon-stats {
+        padding: 20px 10px;
+      }
     }
   </style>
 </head>
@@ -172,97 +205,79 @@
 
 <div class="wrapper">
   <!-- Sidebar -->
- <div class="sidebar">
-  <div class="sidebar-icon">
-    ALL
-    <img src="https://i.imgur.com/NMzQ7XP.png" alt="All">
+  <div class="sidebar">
+    <div class="sidebar-icon">ALL<img src="https://i.imgur.com/NMzQ7XP.png" alt=""></div>
+    <div class="sidebar-icon">RIFLE<img src="https://i.imgur.com/NMzQ7XP.png" alt=""></div>
+    <div class="sidebar-icon">SMG<img src="https://i.imgur.com/NMzQ7XP.png" alt=""></div>
+    <div class="sidebar-icon">SHOTGUN<img src="https://i.imgur.com/NMzQ7XP.png" alt=""></div>
+    <div class="sidebar-icon">MR<img src="https://i.imgur.com/NMzQ7XP.png" alt=""></div>
+    <div class="sidebar-icon">SR<img src="https://i.imgur.com/NMzQ7XP.png" alt=""></div>
   </div>
-  <div class="sidebar-icon">
-    RIFLE
-    <img src="https://i.imgur.com/NMzQ7XP.png" alt="Rifle">
-  </div>
-  <div class="sidebar-icon">
-    SMG
-    <img src="https://i.imgur.com/NMzQ7XP.png" alt="SMG">
-  </div>
-  <div class="sidebar-icon">
-    SHOTGUN
-    <img src="https://i.imgur.com/NMzQ7XP.png" alt="Shotgun">
-  </div>
-  <div class="sidebar-icon">
-    MR
-    <img src="https://i.imgur.com/NMzQ7XP.png" alt="MR">
-  </div>
-  <div class="sidebar-icon">
-    SR
-    <img src="https://i.imgur.com/NMzQ7XP.png" alt="SR">
-  </div>
-</div>
 
   <!-- Weapon List -->
   <div class="weapon-list">
-  <div class="weapon-button active" onclick="selectWeapon('AK47', event)">
-    AK47 Assault Rifle
-    <img src="https://i.imgur.com/riKak4v.png" alt="AK47">
-  </div>
-  <div class="weapon-button" onclick="selectWeapon('M1887', event)">
-    M1887 Shotgun
-    <img src="https://i.imgur.com/G4XKcXm.png" alt="M1887">
-  </div>
-  <div class="weapon-button" onclick="selectWeapon('Plasma', event)">
-    Plasma Gun
-    <img src="https://i.imgur.com/svVpglZ.png" alt="Plasma">
-  </div>
-</div>
-  <!-- Weapon Stats -->
-  <div class="weapon-stats">
-    <h2 id="weaponName">AK47 Assault Rifle</h2>
-    <div class="stat-block">
-      <label>Damage</label>
-      <div class="stat-bar">
-        <div class="bar-bg"><div id="barDamage" class="stat-fill"></div></div>
-        <div class="stat-val" id="statDamage">80</div>
-      </div>
+    <div class="weapon-button active" onclick="selectWeapon('AK47', event)">
+      AK47 Assault Rifle
+      <img src="https://i.imgur.com/riKak4v.png" alt="AK47">
     </div>
-    <div class="stat-block">
-      <label>Range</label>
-      <div class="stat-bar">
-        <div class="bar-bg"><div id="barRange" class="stat-fill"></div></div>
-        <div class="stat-val" id="statRange">72</div>
-      </div>
+    <div class="weapon-button" onclick="selectWeapon('M1887', event)">
+      M1887 Shotgun
+      <img src="https://i.imgur.com/G4XKcXm.png" alt="M1887">
     </div>
-    <div class="stat-block">
-      <label>Rate of Fire</label>
-      <div class="stat-bar">
-        <div class="bar-bg"><div id="barROF" class="stat-fill"></div></div>
-        <div class="stat-val" id="statROF">60</div>
-      </div>
-    </div>
-    <div class="stat-block">
-      <label>Magazine</label>
-      <div class="stat-bar">
-        <div class="bar-bg"><div id="barMag" class="stat-fill"></div></div>
-        <div class="stat-val" id="statMag">30</div>
-      </div>
-    </div>
-    <div class="stat-block">
-      <label>Accuracy</label>
-      <div class="stat-bar">
-        <div class="bar-bg"><div id="barAcc" class="stat-fill"></div></div>
-        <div class="stat-val" id="statAcc">65</div>
-      </div>
-    </div>
-
-    <div class="extra-attributes">
-      <p><strong>Mode:</strong> <span id="statMode">Auto</span></p>
-      <p><strong>Velocity:</strong> <span id="statVel">700 m/s</span></p>
-      <p><strong>Description:</strong> <span id="statDesc">A powerful assault rifle with high damage output but moderate recoil.</span></p>
+    <div class="weapon-button" onclick="selectWeapon('Plasma', event)">
+      Plasma Gun
+      <img src="https://i.imgur.com/svVpglZ.png" alt="Plasma">
     </div>
   </div>
 
-  <!-- Weapon Preview -->
-  <div class="weapon-display">
+  <!-- Right: Weapon Image + Stats -->
+  <div class="weapon-display-panel">
     <img id="weaponImg" src="https://i.imgur.com/riKak4v.png" alt="Weapon">
+    <div class="weapon-stats">
+      <h2 id="weaponName">AK47 Assault Rifle</h2>
+
+      <div class="stat-block">
+        <label>Damage</label>
+        <div class="stat-bar">
+          <div class="bar-bg"><div id="barDamage" class="stat-fill"></div></div>
+          <div class="stat-val" id="statDamage">80</div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <label>Range</label>
+        <div class="stat-bar">
+          <div class="bar-bg"><div id="barRange" class="stat-fill"></div></div>
+          <div class="stat-val" id="statRange">72</div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <label>Rate of Fire</label>
+        <div class="stat-bar">
+          <div class="bar-bg"><div id="barROF" class="stat-fill"></div></div>
+          <div class="stat-val" id="statROF">60</div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <label>Magazine</label>
+        <div class="stat-bar">
+          <div class="bar-bg"><div id="barMag" class="stat-fill"></div></div>
+          <div class="stat-val" id="statMag">30</div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <label>Accuracy</label>
+        <div class="stat-bar">
+          <div class="bar-bg"><div id="barAcc" class="stat-fill"></div></div>
+          <div class="stat-val" id="statAcc">65</div>
+        </div>
+      </div>
+
+      <div class="extra-attributes">
+        <p><strong>Mode:</strong> <span id="statMode">Auto</span></p>
+        <p><strong>Velocity:</strong> <span id="statVel">700 m/s</span></p>
+        <p><strong>Description:</strong> <span id="statDesc">A powerful assault rifle with high damage output but moderate recoil.</span></p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -330,7 +345,6 @@
     event.currentTarget.classList.add('active');
   }
 
-  // Init
   window.onload = () => {
     const first = document.querySelector('.weapon-button');
     selectWeapon('AK47', { currentTarget: first });

@@ -15,7 +15,6 @@
     :root{
       --bg:#030507;
       --panel:rgba(0,255,200,.06);
-      --panel2:rgba(0,255,200,.03);
       --line:rgba(0,255,200,.22);
       --line-soft:rgba(255,255,255,.10);
       --ink:#f3fffb;
@@ -140,13 +139,6 @@
       line-height:1;
       color:var(--brand);
       text-shadow:0 0 12px rgba(0,255,200,.28), 0 0 24px rgba(0,255,200,.10);
-    }
-
-    .brand-copy p{
-      margin-top:10px;
-      color:#c7fff4;
-      font-size:.95rem;
-      max-width:780px;
     }
 
     .status-chip{
@@ -473,10 +465,25 @@
       height:72px;
       display:grid;
       place-items:center;
+      border-radius:16px;
+      background:rgba(255,66,98,.06);
+      border:1px solid rgba(255,66,98,.16);
+      overflow:hidden;
+    }
+
+    .position-icon img{
+      width:52px;
+      height:52px;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 0 10px rgba(255,66,98,.16));
+    }
+
+    .position-fallback{
+      font-family:'Orbitron',sans-serif;
       color:var(--danger);
-      font-size:3rem;
-      line-height:1;
-      filter:drop-shadow(0 0 10px rgba(255,66,98,.18));
+      font-size:1.45rem;
+      text-transform:uppercase;
     }
 
     .label-red{
@@ -529,18 +536,6 @@
       background:rgba(0,255,200,.03);
     }
 
-    .footer-note{
-      margin-top:16px;
-      text-align:center;
-      color:#b8ece2;
-      font-size:.84rem;
-      opacity:.92;
-    }
-
-    code{
-      color:#d8fff7;
-    }
-
     @media (max-width:1100px){
       .layout{
         grid-template-columns:1fr;
@@ -549,6 +544,30 @@
       .list-panel{
         position:static;
         max-height:none;
+      }
+
+      .operator-list{
+        overflow:visible;
+        grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:12px;
+      }
+
+      .operator-card{
+        grid-template-columns:1fr;
+        text-align:center;
+        gap:10px;
+        padding:14px 12px;
+      }
+
+      .thumb{
+        width:100%;
+        max-width:120px;
+        height:120px;
+        margin:0 auto;
+      }
+
+      .role-chip{
+        margin:0 auto 8px;
       }
     }
 
@@ -567,12 +586,17 @@
       }
 
       .detail-header{
-        grid-template-columns:1fr;
+        grid-template-columns:88px minmax(0,1fr);
+        gap:14px;
       }
 
       .detail-thumb{
-        width:100px;
-        height:100px;
+        width:88px;
+        height:88px;
+      }
+
+      .detail-title h2{
+        font-size:2rem;
       }
 
       .position-row{
@@ -580,29 +604,44 @@
       }
 
       .position-icon{
-        width:auto;
-        height:auto;
-        justify-self:start;
-        font-size:2.4rem;
+        width:72px;
+        height:72px;
       }
     }
 
     @media (max-width:560px){
+      .operator-list{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:10px;
+      }
+
       .operator-card{
-        grid-template-columns:72px minmax(0,1fr);
+        padding:12px 10px;
+        border-radius:18px;
       }
 
       .thumb{
-        width:72px;
-        height:72px;
+        max-width:96px;
+        height:96px;
       }
 
       .codename{
-        font-size:.95rem;
+        font-size:.88rem;
       }
 
-      .detail-title h2{
-        font-size:2rem;
+      .realname{
+        font-size:.8rem;
+      }
+
+      .role-chip{
+        font-size:.65rem;
+        padding:4px 8px;
+      }
+    }
+
+    @media (max-width:380px){
+      .operator-list{
+        grid-template-columns:1fr;
       }
     }
   </style>
@@ -650,7 +689,6 @@
         <div id="detailRoot" class="detail-empty">Waiting for operator data...</div>
       </section>
     </section>
-
   </main>
 
   <script>
@@ -659,10 +697,16 @@
     const TABLE_NAME = 'operator';
     const REST_URL = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?select=*`;
 
-    const IMAGE_BASES = [
+    const OPERATOR_IMAGE_BASES = [
       './assets/img/operators',
       'assets/img/operators',
       '/assets/img/operators'
+    ];
+
+    const ROLE_IMAGE_BASES = [
+      './assets/img/role',
+      'assets/img/role',
+      '/assets/img/role'
     ];
 
     const KNOWN_OPERATOR_SLUGS = [
@@ -682,11 +726,21 @@
       'raptor'
     ];
 
+    const KNOWN_ROLE_SLUGS = [
+      'assault',
+      'support',
+      'engineer',
+      'recon'
+    ];
+
+    const PLACEHOLDER_TEXT = 'Description placeholder — to be added later.';
+
     const state = {
       all: [],
       filtered: [],
       selectedId: null,
-      imageCache: new Map()
+      operatorImageCache: new Map(),
+      roleImageCache: new Map()
     };
 
     const els = {
@@ -749,12 +803,16 @@
       return '';
     }
 
-    function toOperatorSlug(value) {
+    function slugify(value) {
       let slug = safeText(value).toLowerCase();
       slug = slug.replace(/_/g, '-').replace(/\s+/g, '-');
       slug = slug.replace(/[^a-z0-9-]/g, '');
       slug = slug.replace(/-+/g, '-').replace(/^-|-$/g, '');
+      return slug;
+    }
 
+    function toOperatorSlug(value) {
+      const slug = slugify(value);
       if (KNOWN_OPERATOR_SLUGS.includes(slug)) return slug;
 
       const compact = slug.replace(/-/g, '');
@@ -762,36 +820,43 @@
       return found || slug;
     }
 
+    function toRoleSlug(value) {
+      const slug = slugify(value);
+      if (KNOWN_ROLE_SLUGS.includes(slug)) return slug;
+      if (slug.includes('assault')) return 'assault';
+      if (slug.includes('support')) return 'support';
+      if (slug.includes('engineer')) return 'engineer';
+      if (slug.includes('recon')) return 'recon';
+      return slug;
+    }
+
     function roleValue(op) {
       return op.role || 'Unknown';
     }
 
-    function roleSymbol(role) {
-      const r = safeText(role).toLowerCase();
-      if (r.includes('assault')) return '▲';
-      if (r.includes('support')) return '✚';
-      if (r.includes('engineer')) return '⬢';
-      if (r.includes('recon')) return '◉';
-      return '▲';
-    }
-
-    function imageCandidates(op) {
+    function operatorImageCandidates(op) {
       if (!op.imageKey) return [];
-      return IMAGE_BASES.map(base => `${base}/${op.imageKey}.png`);
+      return OPERATOR_IMAGE_BASES.map(base => `${base}/${op.imageKey}.png`);
     }
 
-    function resolveImage(op) {
-      if (state.imageCache.has(op.id)) {
-        return Promise.resolve(state.imageCache.get(op.id));
+    function roleImageCandidates(role) {
+      const roleSlug = toRoleSlug(role);
+      if (!roleSlug) return [];
+      return ROLE_IMAGE_BASES.map(base => `${base}/${roleSlug}.png`);
+    }
+
+    function resolveOperatorImage(op) {
+      if (state.operatorImageCache.has(op.id)) {
+        return Promise.resolve(state.operatorImageCache.get(op.id));
       }
 
-      const candidates = imageCandidates(op);
+      const candidates = operatorImageCandidates(op);
       let index = 0;
 
       return new Promise(resolve => {
         const tryNext = () => {
           if (index >= candidates.length) {
-            state.imageCache.set(op.id, '');
+            state.operatorImageCache.set(op.id, '');
             resolve('');
             return;
           }
@@ -800,7 +865,7 @@
           const img = new Image();
 
           img.onload = () => {
-            state.imageCache.set(op.id, src);
+            state.operatorImageCache.set(op.id, src);
             resolve(src);
           };
 
@@ -812,25 +877,70 @@
       });
     }
 
+    function resolveRoleImage(role) {
+      const key = toRoleSlug(role);
+      if (state.roleImageCache.has(key)) {
+        return Promise.resolve(state.roleImageCache.get(key));
+      }
+
+      const candidates = roleImageCandidates(role);
+      let index = 0;
+
+      return new Promise(resolve => {
+        const tryNext = () => {
+          if (index >= candidates.length) {
+            state.roleImageCache.set(key, '');
+            resolve('');
+            return;
+          }
+
+          const src = candidates[index++];
+          const img = new Image();
+
+          img.onload = () => {
+            state.roleImageCache.set(key, src);
+            resolve(src);
+          };
+
+          img.onerror = tryNext;
+          img.src = src;
+        };
+
+        tryNext();
+      });
+    }
+
+    function normalizeAbility(type, title, desc) {
+      const cleanType = safeText(type);
+      const cleanTitle = safeText(title);
+      let cleanDesc = safeText(desc);
+
+      if ((cleanType === 'Gadget' || cleanType === 'Trait') && !cleanDesc) {
+        cleanDesc = PLACEHOLDER_TEXT;
+      }
+
+      if (!cleanTitle && !cleanDesc) return null;
+
+      return {
+        type: cleanType || 'Ability',
+        title: cleanTitle || (cleanType === 'Gadget' ? 'Pending Gadget' : cleanType === 'Trait' ? 'Pending Trait' : 'Ability'),
+        desc: cleanDesc || 'No description available.'
+      };
+    }
+
     function buildAbilities(row) {
       const flat = flattenRow(row);
       const abilities = [];
       const seen = new Set();
 
       function pushAbility(type, title, desc) {
-        const cleanTitle = safeText(title);
-        const cleanDesc = safeText(desc);
-        if (!cleanTitle && !cleanDesc) return;
+        const item = normalizeAbility(type, title, desc);
+        if (!item) return;
 
-        const sig = `${type}|${cleanTitle}|${cleanDesc}`.toLowerCase();
+        const sig = `${item.type}|${item.title}|${item.desc}`.toLowerCase();
         if (seen.has(sig)) return;
         seen.add(sig);
-
-        abilities.push({
-          type: safeText(type) || 'Ability',
-          title: cleanTitle || safeText(type) || 'Ability',
-          desc: cleanDesc || 'No description available.'
-        });
+        abilities.push(item);
       }
 
       pushAbility(
@@ -857,7 +967,15 @@
         getValue(flat, ['trait_desc', 'trait_description', 'passive_desc', 'passive_description', 'perk_desc', 'perk_description'])
       );
 
-      return abilities.filter(item => item.title || item.desc);
+      if (!abilities.some(item => item.type === 'Gadget')) {
+        pushAbility('Gadget', 'Pending Gadget', '');
+      }
+
+      if (!abilities.some(item => item.type === 'Trait')) {
+        pushAbility('Trait', 'Pending Trait', '');
+      }
+
+      return abilities;
     }
 
     function normalizeOperator(row, index = 0) {
@@ -970,7 +1088,7 @@
 
       const cards = await Promise.all(
         state.filtered.map(async op => {
-          const imageSrc = await resolveImage(op);
+          const imageSrc = await resolveOperatorImage(op);
           return `
             <article class="operator-card ${op.id === state.selectedId ? 'active' : ''}" data-id="${escapeHtml(op.id)}">
               ${renderThumb(imageSrc, op.codename)}
@@ -1009,7 +1127,8 @@
 
       state.selectedId = op.id;
 
-      const imageSrc = await resolveImage(op);
+      const imageSrc = await resolveOperatorImage(op);
+      const roleImageSrc = await resolveRoleImage(op.role);
       const roleTitle = op.role || 'Unknown';
       const roleDesc = op.roleDesc || op.bio || 'No role description available.';
       const chips = [op.role, op.faction, op.origin].filter(Boolean);
@@ -1040,7 +1159,11 @@
 
           <div class="info-block">
             <div class="position-row">
-              <div class="position-icon">${escapeHtml(roleSymbol(roleTitle))}</div>
+              <div class="position-icon">
+                ${roleImageSrc
+                  ? `<img src="${escapeHtml(roleImageSrc)}" alt="${escapeHtml(roleTitle)}">`
+                  : `<div class="position-fallback">${escapeHtml((roleTitle || '?').charAt(0))}</div>`}
+              </div>
               <div>
                 <span class="label-red">Position</span>
                 <div class="position-title">${escapeHtml(roleTitle)}</div>
@@ -1101,9 +1224,6 @@
 
         state.all = rows.map((row, index) => normalizeOperator(row, index)).sort(operatorSort);
         state.selectedId = state.all[0]?.id || null;
-
-        console.log('Sample operator row:', rows[0]);
-        console.log('Resolved image keys:', state.all.map(op => ({ codename: op.codename, imageKey: op.imageKey })));
 
         populateRoleFilter();
         await renderAll();

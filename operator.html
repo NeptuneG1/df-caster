@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delta Force — Operators</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #041016;
+      --bg-deep: #02070a;
+      --panel: rgba(0, 255, 200, 0.06);
+      --panel-2: rgba(2, 20, 18, 0.88);
+      --line: rgba(0, 255, 200, 0.22);
+      --line-soft: rgba(191, 254, 243, 0.12);
+      --ink: #e9fff8;
+      --muted: #9dd9cb;
+      --brand: #00ffc8;
+      --brand-2: #7fffe2;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+      --radius: 18px;
+      --radius-lg: 28px;
+      --max: 1480px;
+      --header-h: 108px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.72)),
+        url('https://i.imgur.com/TytkDtb.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at top center, rgba(0,255,200,.18), transparent 35%),
+        linear-gradient(180deg, rgba(0,0,0,.00), rgba(0,0,0,.18));
+      z-index: 0;
+    }
+
+    #preloader {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      z-index: 9999;
+      transition: opacity .4s ease, visibility .4s ease;
+    }
+
+    #preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 6px solid rgba(0, 255, 200, 0.18);
+      border-top-color: var(--brand);
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 22px rgba(0,255,200,.16);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 24px 20px 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 10px 0 18px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .brand-wrap img {
+      width: 74px;
+      max-width: 100%;
+      filter: drop-shadow(0 0 10px rgba(0,255,200,.35));
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy .eyebrow {
+      font-family: Orbitron, sans-serif;
+      letter-spacing: 2px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(2rem, 4vw, 3.75rem);
+      line-height: 1;
+      letter-spacing: 4px;
+      color: var(--brand);
+      text-shadow: 0 0 10px rgba(0,255,200,.28), 0 0 22px rgba(0,112,96,.35);
+    }
+
+    .brand-copy p {
+      margin: 10px 0 0;
+      color: #bffef3;
+      font-size: 0.95rem;
+      max-width: 780px;
+    }
+
+    .status-chip {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(0,255,200,.08);
+      color: var(--brand-2);
+      font-size: 0.88rem;
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brand);
+      box-shadow: 0 0 12px var(--brand);
+    }
+
+    .controls {
+      margin: 18px 0 22px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1.5fr) minmax(160px, .7fr) auto;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .field, .select, .ghost-btn {
+      min-height: 50px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(0, 11, 10, 0.74);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .field, .select {
+      width: 100%;
+      padding: 0 15px;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    .field::placeholder { color: rgba(191, 254, 243, 0.48); }
+
+    .field:focus, .select:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(0,255,200,.11), var(--shadow);
+    }
+
+    .ghost-btn {
+      padding: 0 16px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--brand);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .ghost-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(0,255,200,.08), var(--shadow);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(0,255,200,.06), rgba(0,255,200,.03));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    .grid-panel {
+      padding: 16px;
+    }
+
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding: 0 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .operator-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .operator-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid var(--line-soft);
+      background: rgba(0,255,200,.045);
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .operator-card:hover,
+    .operator-card.active {
+      transform: translateY(-2px);
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(0,255,200,.08), 0 18px 36px rgba(0,0,0,.28);
+    }
+
+    .operator-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,255,200,.06), transparent 38%, rgba(0,0,0,.18));
+      pointer-events: none;
+    }
+
+    .operator-thumb {
+      position: relative;
+      aspect-ratio: 4 / 4.8;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(0,255,200,.18), transparent 36%),
+        linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.44)),
+        #061113;
+      border-bottom: 1px solid rgba(0,255,200,.08);
+    }
+
+    .operator-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .placeholder {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      text-align: center;
+      font-family: Orbitron, sans-serif;
+      font-size: 1.2rem;
+      color: rgba(233,255,248,.86);
+      letter-spacing: 1px;
+    }
+
+    .operator-body {
+      padding: 14px 14px 15px;
+    }
+
+    .operator-name {
+      margin: 0;
+      font-family: Orbitron, sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 1px;
+      color: var(--brand);
+      text-transform: uppercase;
+      min-height: 2.5em;
+    }
+
+    .operator-sub {
+      margin: 7px 0 0;
+      color: #d4fff7;
+      font-size: 0.9rem;
+      min-height: 2.6em;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      border: 1px solid rgba(0,255,200,.18);
+      background: rgba(0,255,200,.07);
+      color: #bffef3;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+
+    .detail-panel {
+      position: sticky;
+      top: 18px;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .detail-head {
+      display: grid;
+      grid-template-columns: minmax(140px, 180px) minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .detail-portrait {
+      min-height: 220px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line-soft);
+      background:
+        radial-gradient(circle at 50% 18%, rgba(0,255,200,.18), transparent 35%),
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.42)),
+        #071114;
+    }
+
+    .detail-portrait img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .detail-title {
+      min-width: 0;
+    }
+
+    .detail-title .kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: Orbitron, sans-serif;
+      font-size: 0.74rem;
+    }
+
+    .detail-title h2 {
+      margin: 8px 0 8px;
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(1.6rem, 2vw, 2.4rem);
+      line-height: 1.05;
+      color: var(--brand);
+      text-transform: uppercase;
+    }
+
+    .detail-title p {
+      margin: 0;
+      color: #d5fff8;
+      font-size: 0.96rem;
+      line-height: 1.6;
+    }
+
+    .section {
+      margin-top: 14px;
+      padding: 15px;
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      background: rgba(0,255,200,.035);
+    }
+
+    .section h3 {
+      margin: 0 0 12px;
+      font-family: Orbitron, sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 1.6px;
+      color: var(--brand);
+      text-transform: uppercase;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .meta-item {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(0,255,200,.08);
+    }
+
+    .meta-item .label {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .meta-item .value {
+      color: var(--ink);
+      font-size: .92rem;
+      word-break: break-word;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .skill-card {
+      padding: 12px 12px 13px;
+      border-radius: 16px;
+      border: 1px solid rgba(0,255,200,.10);
+      background: linear-gradient(180deg, rgba(0,255,200,.05), rgba(0,0,0,.16));
+    }
+
+    .skill-card .type {
+      color: var(--muted);
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .skill-card h4 {
+      margin: 0 0 7px;
+      color: var(--brand);
+      font-size: .95rem;
+      line-height: 1.35;
+    }
+
+    .skill-card p {
+      margin: 0;
+      color: #d6fff8;
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+
+    .raw-wrap details {
+      border: 1px solid rgba(0,255,200,.10);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(0,0,0,.18);
+    }
+
+    .raw-wrap summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 13px 14px;
+      font-weight: 700;
+      color: #c9fff6;
+      user-select: none;
+    }
+
+    .raw-wrap summary::-webkit-details-marker { display: none; }
+
+    .raw-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .86rem;
+    }
+
+    .raw-table td {
+      vertical-align: top;
+      padding: 10px 14px;
+      border-top: 1px solid rgba(0,255,200,.08);
+    }
+
+    .raw-table td:first-child {
+      width: 36%;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      font-size: .74rem;
+    }
+
+    .empty-state, .error-state {
+      padding: 28px;
+      text-align: center;
+      color: #d9fff9;
+      border: 1px dashed rgba(0,255,200,.24);
+      border-radius: 20px;
+      background: rgba(0,255,200,.03);
+    }
+
+    .error-state strong {
+      color: #fff;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: #b4e8dd;
+      font-size: .83rem;
+      text-align: center;
+      opacity: .9;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-head,
+      .skills-grid,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .operator-grid {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      }
+
+      .brand-wrap img {
+        width: 58px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="preloader">
+    <div class="loader"></div>
+    <div style="font-family: Orbitron, sans-serif; letter-spacing: 2px; color: #00ffc8;">Loading Operator Protocol...</div>
+  </div>
+
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <img src="https://i.imgur.com/LtMzKj2.png" alt="Delta Force Logo">
+        <div class="brand-copy">
+          <div class="eyebrow">Tactical Reference</div>
+          <h1>DELTA FORCE</h1>
+          <p>Operator database pulled from Supabase and matched with local portrait assets in <strong>/assets/img/operators</strong>.</p>
+        </div>
+      </div>
+      <div class="status-chip"><span class="status-dot"></span><span id="dbStatus">Connecting to operator database...</span></div>
+    </header>
+
+    <section class="controls">
+      <input id="searchInput" class="field" type="text" placeholder="Search operator, codename, role, faction..." />
+      <select id="roleFilter" class="select">
+        <option value="all">All roles</option>
+      </select>
+      <button id="refreshBtn" class="ghost-btn" type="button">Refresh Data</button>
+    </section>
+
+    <section class="layout">
+      <section class="panel grid-panel">
+        <div class="results-bar">
+          <div id="resultsText">Loading operators...</div>
+          <div id="resultsHint">Select an operator to view details.</div>
+        </div>
+        <div id="grid" class="operator-grid"></div>
+      </section>
+
+      <aside class="panel detail-panel">
+        <div id="detailRoot" class="empty-state">Waiting for operator data...</div>
+      </aside>
+    </section>
+
+    <div class="footer-note">Update <code>IMAGE_BASE</code> in the script if your site uses a different operator image folder.</div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://cfocwrjlsuqdpwisvvbm.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nmb2N3cmpsc3VxZHB3aXN2dmJtLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJhbm9uLWtleSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzc1NDY5OTE0LCJleHAiOjIwOTEwNDU5MTR9._fV9yPZHX26kpcRuvwX56sjo5Jnv-6LQRS4HjMW8ecQ';
+  </script>
+
+  <script>
+    const REST_URL = `${SUPABASE_URL}/rest/v1/operator?select=*`;
+    const IMAGE_BASE = '/assets/img/operators';
+
+    const state = {
+      all: [],
+      filtered: [],
+      selectedId: null,
+      imageCache: new Map()
+    };
+
+    const els = {
+      preloader: document.getElementById('preloader'),
+      dbStatus: document.getElementById('dbStatus'),
+      searchInput: document.getElementById('searchInput'),
+      roleFilter: document.getElementById('roleFilter'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      resultsText: document.getElementById('resultsText'),
+      resultsHint: document.getElementById('resultsHint'),
+      grid: document.getElementById('grid'),
+      detailRoot: document.getElementById('detailRoot')
+    };
+
+    function safeText(value) {
+      if (value === null || value === undefined) return '';
+      if (typeof value === 'string') return value.trim();
+      if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+      if (Array.isArray(value)) return value.map(safeText).filter(Boolean).join(', ');
+      if (typeof value === 'object') {
+        try {
+          return JSON.stringify(value, null, 2);
+        } catch {
+          return String(value);
+        }
+      }
+      return String(value);
+    }
+
+    function pick(obj, keys) {
+      for (const key of keys) {
+        if (key in obj && safeText(obj[key])) return obj[key];
+      }
+      return '';
+    }
+
+    function titleCaseFromKey(key) {
+      return key
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function normalizeOperator(row) {
+      const name = safeText(pick(row, ['name', 'operator', 'operator_name', 'display_name', 'title', 'full_name'])) || 'Unknown Operator';
+      const codename = safeText(pick(row, ['codename', 'code_name', 'alias', 'nickname', 'callsign']));
+      const role = safeText(pick(row, ['role', 'class', 'operator_class', 'specialty', 'type']));
+      const faction = safeText(pick(row, ['faction', 'unit', 'team', 'squad', 'organization']));
+      const origin = safeText(pick(row, ['nationality', 'origin', 'country']));
+      const bio = safeText(pick(row, ['bio', 'description', 'overview', 'summary', 'lore', 'backstory', 'operator_description']));
+      const quote = safeText(pick(row, ['quote', 'tagline', 'motto']));
+      const id = safeText(pick(row, ['id', 'uuid', 'operator_id'])) || `${name}-${codename}`;
+
+      return {
+        raw: row,
+        id,
+        name,
+        codename,
+        role,
+        faction,
+        origin,
+        bio,
+        quote,
+        imageField: safeText(pick(row, ['image', 'image_url', 'portrait', 'portrait_url', 'thumbnail', 'thumb'])),
+        skills: extractSkills(row)
+      };
+    }
+
+    function extractSkills(row) {
+      const skills = [];
+      const pushSkill = (type, name, desc) => {
+        const cleanName = safeText(name);
+        const cleanDesc = safeText(desc);
+        if (!cleanName && !cleanDesc) return;
+        const signature = `${cleanName}||${cleanDesc}`.toLowerCase();
+        if (skills.some(s => `${s.name}||${s.desc}`.toLowerCase() === signature)) return;
+        skills.push({
+          type: type || 'Ability',
+          name: cleanName || type || 'Ability',
+          desc: cleanDesc || 'No description available.'
+        });
+      };
+
+      const predefined = [
+        ['Tactical', ['tactical_name', 'skill_1_name', 'skill1_name', 'active_name', 'gadget_name'], ['tactical_description', 'tactical_desc', 'skill_1_description', 'skill_1_desc', 'skill1_description', 'skill1_desc', 'active_description', 'active_desc', 'gadget_description', 'gadget_desc']],
+        ['Ultimate', ['ultimate_name', 'ult_name', 'skill_2_name', 'skill2_name'], ['ultimate_description', 'ultimate_desc', 'ult_description', 'ult_desc', 'skill_2_description', 'skill_2_desc', 'skill2_description', 'skill2_desc']],
+        ['Passive', ['passive_name', 'trait_name', 'perk_name', 'skill_3_name', 'skill3_name'], ['passive_description', 'passive_desc', 'trait_description', 'trait_desc', 'perk_description', 'perk_desc', 'skill_3_description', 'skill_3_desc', 'skill3_description', 'skill3_desc']],
+        ['Signature', ['signature_name', 'ability_name'], ['signature_description', 'signature_desc', 'ability_description', 'ability_desc']]
+      ];
+
+      for (const [type, nameKeys, descKeys] of predefined) {
+        pushSkill(type, pick(row, nameKeys), pick(row, descKeys));
+      }
+
+      const keys = Object.keys(row);
+
+      for (const key of keys) {
+        if (!/(skill|ability|passive|ultimate|tactical|gadget|trait|perk)/i.test(key)) continue;
+        if (!/name$/i.test(key)) continue;
+        const base = key.replace(/name$/i, '');
+        const desc = row[`${base}description`] ?? row[`${base}desc`] ?? row[`${base}details`] ?? row[`${base}effect`] ?? '';
+        pushSkill(titleCaseFromKey(base.replace(/[_-]+$/,'')) || 'Ability', row[key], desc);
+      }
+
+      for (const key of keys) {
+        if (!/(skill|ability|passive|ultimate|tactical|gadget|trait|perk)/i.test(key)) continue;
+        if (/(name|image|icon|url)$/i.test(key)) continue;
+        if (typeof row[key] !== 'string') continue;
+        if (safeText(row[key]).length < 14) continue;
+        const type = titleCaseFromKey(key);
+        pushSkill(type, type, row[key]);
+      }
+
+      return skills.slice(0, 8);
+    }
+
+    function roleValue(op) {
+      return op.role || op.faction || 'Unknown';
+    }
+
+    function slugify(value) {
+      return safeText(value)
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase();
+    }
+
+    function imageCandidates(op) {
+      const names = [
+        op.imageField,
+        op.name,
+        op.codename,
+        op.raw.filename,
+        op.raw.file_name,
+        op.raw.slug,
+        op.raw.handle
+      ].map(safeText).filter(Boolean);
+
+      const variants = new Set();
+      const exts = ['webp', 'png', 'jpg', 'jpeg', 'avif'];
+
+      for (const item of names) {
+        const raw = item.replace(/^\/+/, '');
+        if (/^https?:\/\//i.test(raw)) {
+          variants.add(raw);
+          continue;
+        }
+        if (/\.(png|jpe?g|webp|avif)$/i.test(raw)) {
+          variants.add(`${IMAGE_BASE}/${raw}`.replace(/([^:]\/)\/+?/g, '$1'));
+        }
+
+        const slug = slugify(item);
+        const compact = slug.replace(/-/g, '');
+        const spaced = item.trim();
+        const underscored = slug.replace(/-/g, '_');
+
+        [slug, compact, underscored, spaced].filter(Boolean).forEach(base => {
+          exts.forEach(ext => variants.add(`${IMAGE_BASE}/${base}.${ext}`));
+          exts.forEach(ext => variants.add(`${IMAGE_BASE}/${base}-portrait.${ext}`));
+          exts.forEach(ext => variants.add(`${IMAGE_BASE}/${base}_portrait.${ext}`));
+        });
+      }
+
+      return [...variants];
+    }
+
+    function escapeHtml(value) {
+      return safeText(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function resolveImage(op) {
+      if (state.imageCache.has(op.id)) return Promise.resolve(state.imageCache.get(op.id));
+
+      const candidates = imageCandidates(op);
+      let index = 0;
+
+      return new Promise(resolve => {
+        const tryNext = () => {
+          if (index >= candidates.length) {
+            state.imageCache.set(op.id, '');
+            resolve('');
+            return;
+          }
+          const src = candidates[index++];
+          const img = new Image();
+          img.onload = () => {
+            state.imageCache.set(op.id, src);
+            resolve(src);
+          };
+          img.onerror = tryNext;
+          img.src = src;
+        };
+        tryNext();
+      });
+    }
+
+    function buildCard(op, imageSrc) {
+      const active = op.id === state.selectedId ? 'active' : '';
+      const subtitle = op.codename || op.bio || 'No operator description found.';
+      return `
+        <article class="operator-card ${active}" data-id="${escapeHtml(op.id)}">
+          <div class="operator-thumb">
+            ${imageSrc
+              ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(op.name)}">`
+              : `<div class="placeholder">${escapeHtml(op.codename || op.name)}</div>`}
+          </div>
+          <div class="operator-body">
+            <h3 class="operator-name">${escapeHtml(op.name)}</h3>
+            <p class="operator-sub">${escapeHtml(subtitle)}</p>
+            <div class="chip-row">
+              ${op.role ? `<span class="chip">${escapeHtml(op.role)}</span>` : ''}
+              ${op.faction ? `<span class="chip">${escapeHtml(op.faction)}</span>` : ''}
+              ${op.origin ? `<span class="chip">${escapeHtml(op.origin)}</span>` : ''}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function buildMeta(op) {
+      const rows = [
+        ['Codename', op.codename],
+        ['Role', op.role],
+        ['Faction', op.faction],
+        ['Origin', op.origin],
+        ['ID', op.id]
+      ].filter(([, value]) => safeText(value));
+
+      if (!rows.length) return '';
+
+      return `
+        <section class="section">
+          <h3>Operator Data</h3>
+          <div class="meta-grid">
+            ${rows.map(([label, value]) => `
+              <div class="meta-item">
+                <span class="label">${escapeHtml(label)}</span>
+                <span class="value">${escapeHtml(value)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+    function buildSkills(op) {
+      if (!op.skills.length) return '';
+
+      return `
+        <section class="section">
+          <h3>Abilities</h3>
+          <div class="skills-grid">
+            ${op.skills.map(skill => `
+              <article class="skill-card">
+                <span class="type">${escapeHtml(skill.type)}</span>
+                <h4>${escapeHtml(skill.name)}</h4>
+                <p>${escapeHtml(skill.desc)}</p>
+              </article>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+    function buildRawTable(op) {
+      const skip = new Set(['image', 'image_url', 'portrait', 'portrait_url', 'thumbnail', 'thumb']);
+      const rows = Object.entries(op.raw)
+        .filter(([key, value]) => !skip.has(key) && safeText(value))
+        .map(([key, value]) => [titleCaseFromKey(key), safeText(value)]);
+
+      if (!rows.length) return '';
+
+      return `
+        <section class="section raw-wrap">
+          <h3>Raw Database Fields</h3>
+          <details>
+            <summary>Show all non-empty fields</summary>
+            <table class="raw-table">
+              <tbody>
+                ${rows.map(([label, value]) => `
+                  <tr>
+                    <td>${escapeHtml(label)}</td>
+                    <td>${escapeHtml(value)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </details>
+        </section>
+      `;
+    }
+
+    async function renderGrid() {
+      if (!state.filtered.length) {
+        els.grid.innerHTML = '<div class="empty-state">No operators matched your current filters.</div>';
+        return;
+      }
+
+      const chunks = await Promise.all(state.filtered.map(async op => buildCard(op, await resolveImage(op))));
+      els.grid.innerHTML = chunks.join('');
+
+      els.grid.querySelectorAll('.operator-card').forEach(card => {
+        card.addEventListener('click', () => {
+          state.selectedId = card.dataset.id;
+          renderAll();
+        });
+      });
+    }
+
+    async function renderDetail() {
+      const op = state.filtered.find(item => item.id === state.selectedId) || state.all.find(item => item.id === state.selectedId) || state.filtered[0] || state.all[0];
+
+      if (!op) {
+        els.detailRoot.className = 'empty-state';
+        els.detailRoot.textContent = 'No operator selected.';
+        return;
+      }
+
+      state.selectedId = op.id;
+      const imageSrc = await resolveImage(op);
+      const lead = op.bio || op.quote || 'No overview text available for this operator yet.';
+
+      els.detailRoot.className = '';
+      els.detailRoot.innerHTML = `
+        <div class="detail-head">
+          <div class="detail-portrait">
+            ${imageSrc
+              ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(op.name)}">`
+              : `<div class="placeholder">${escapeHtml(op.codename || op.name)}</div>`}
+          </div>
+          <div class="detail-title">
+            <div class="kicker">Operator Profile</div>
+            <h2>${escapeHtml(op.name)}</h2>
+            <p>${escapeHtml(lead)}</p>
+            <div class="chip-row">
+              ${op.codename ? `<span class="chip">${escapeHtml(op.codename)}</span>` : ''}
+              ${op.role ? `<span class="chip">${escapeHtml(op.role)}</span>` : ''}
+              ${op.faction ? `<span class="chip">${escapeHtml(op.faction)}</span>` : ''}
+              ${op.origin ? `<span class="chip">${escapeHtml(op.origin)}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        ${buildMeta(op)}
+        ${buildSkills(op)}
+        ${buildRawTable(op)}
+      `;
+    }
+
+    function populateRoleFilter() {
+      const values = [...new Set(state.all.map(roleValue).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      els.roleFilter.innerHTML = `<option value="all">All roles</option>${values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('')}`;
+    }
+
+    function applyFilters() {
+      const q = els.searchInput.value.trim().toLowerCase();
+      const role = els.roleFilter.value;
+
+      state.filtered = state.all.filter(op => {
+        const haystack = [
+          op.name, op.codename, op.role, op.faction, op.origin, op.bio,
+          ...op.skills.flatMap(s => [s.type, s.name, s.desc])
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = !q || haystack.includes(q);
+        const matchesRole = role === 'all' || roleValue(op) === role;
+        return matchesSearch && matchesRole;
+      });
+
+      if (!state.filtered.some(op => op.id === state.selectedId)) {
+        state.selectedId = state.filtered[0]?.id || state.all[0]?.id || null;
+      }
+
+      els.resultsText.textContent = `${state.filtered.length} operator${state.filtered.length === 1 ? '' : 's'} found`;
+      els.resultsHint.textContent = role === 'all' ? 'Filter by role or search by keyword.' : `Showing role: ${role}`;
+    }
+
+    async function renderAll() {
+      applyFilters();
+      await renderGrid();
+      await renderDetail();
+    }
+
+    async function loadOperators() {
+      els.dbStatus.textContent = 'Loading operator database...';
+      els.refreshBtn.disabled = true;
+      els.detailRoot.className = 'empty-state';
+      els.detailRoot.textContent = 'Loading operator data...';
+
+      try {
+        const response = await fetch(REST_URL, {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            Accept: 'application/json',
+            'Accept-Profile': 'public'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
+
+        const rows = await response.json();
+        if (!Array.isArray(rows)) {
+          throw new Error('Unexpected response format from Supabase.');
+        }
+
+        state.all = rows.map(normalizeOperator).sort((a, b) => a.name.localeCompare(b.name));
+        state.selectedId = state.all[0]?.id || null;
+
+        populateRoleFilter();
+        await renderAll();
+
+        els.dbStatus.textContent = `Connected — ${state.all.length} operators loaded`;
+      } catch (error) {
+        console.error(error);
+        els.dbStatus.textContent = 'Connection failed';
+        els.grid.innerHTML = `<div class="error-state"><strong>Unable to load operators.</strong><br>${escapeHtml(error.message)}</div>`;
+        els.detailRoot.className = 'error-state';
+        els.detailRoot.innerHTML = `<strong>Supabase request failed.</strong><br>Check the anon key, table permissions, or update the field mapping in the page script.`;
+      } finally {
+        els.refreshBtn.disabled = false;
+        window.setTimeout(() => els.preloader.classList.add('hidden'), 350);
+      }
+    }
+
+    els.searchInput.addEventListener('input', () => renderAll());
+    els.roleFilter.addEventListener('change', () => renderAll());
+    els.refreshBtn.addEventListener('click', loadOperators);
+
+    window.addEventListener('load', loadOperators);
+  </script>
+</body>
+</html>

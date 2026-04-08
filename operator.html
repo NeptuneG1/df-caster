@@ -1127,13 +1127,7 @@
     }
 
     function operatorSort(a, b) {
-      const ai = KNOWN_OPERATOR_SLUGS.indexOf(a.imageKey);
-      const bi = KNOWN_OPERATOR_SLUGS.indexOf(b.imageKey);
-
-      if (ai !== -1 && bi !== -1) return ai - bi;
-      if (ai !== -1) return -1;
-      if (bi !== -1) return 1;
-      return a.codename.localeCompare(b.codename);
+      return a.codename.localeCompare(b.codename, undefined, { sensitivity: 'base' });
     }
 
     function populateRoleFilter() {

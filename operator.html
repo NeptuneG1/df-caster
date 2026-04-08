@@ -399,8 +399,41 @@
     }
 
     .detail-wrap{
+      position:relative;
       padding:24px 26px;
       min-height:100%;
+      overflow:hidden;
+    }
+
+    .detail-bg-art{
+      position:absolute;
+      top:14px;
+      right:18px;
+      width:min(38%, 360px);
+      max-height:260px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:flex-end;
+      pointer-events:none;
+      z-index:0;
+      opacity:.9;
+    }
+
+    .detail-bg-art img{
+      width:100%;
+      height:auto;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 10px 28px rgba(0,0,0,.30));
+      opacity:.92;
+    }
+
+    .detail-header,
+    .separator,
+    .mini-chip-row,
+    .info-block{
+      position:relative;
+      z-index:1;
     }
 
     .detail-header{
@@ -640,6 +673,14 @@
         padding:18px 16px 20px;
       }
 
+      .detail-bg-art{
+        width:min(42%, 180px);
+        top:10px;
+        right:10px;
+        max-height:150px;
+        opacity:.5;
+      }
+
       .detail-header{
         grid-template-columns:80px minmax(0,1fr);
         gap:12px;
@@ -714,6 +755,14 @@
         font-size:.62rem;
         padding:4px 7px;
       }
+
+      .detail-bg-art{
+        width:min(38%, 130px);
+        top:8px;
+        right:8px;
+        max-height:110px;
+        opacity:.38;
+      }
     }
 
     @media (max-width:380px){
@@ -784,6 +833,12 @@
       '/assets/img/operators'
     ];
 
+    const OPERATOR_BG_IMAGE_BASES = [
+      './assets/img/operator_bg',
+      'assets/img/operator_bg',
+      '/assets/img/operator_bg'
+    ];
+
     const ROLE_IMAGE_BASES = [
       './assets/img/role',
       'assets/img/role',
@@ -821,6 +876,7 @@
       filtered: [],
       selectedId: null,
       operatorImageCache: new Map(),
+      operatorBgImageCache: new Map(),
       roleImageCache: new Map()
     };
 
@@ -948,6 +1004,15 @@
       return OPERATOR_IMAGE_BASES.map(base => `${base}/${op.imageKey}.png`);
     }
 
+    function operatorBgImageCandidates(op) {
+      if (!op.imageKey) return [];
+      return [
+        ...OPERATOR_BG_IMAGE_BASES.map(base => `${base}/${op.imageKey}_bg.jpg`),
+        ...OPERATOR_BG_IMAGE_BASES.map(base => `${base}/${op.imageKey}_bg.png`),
+        ...OPERATOR_BG_IMAGE_BASES.map(base => `${base}/${op.imageKey}_bg.webp`)
+      ];
+    }
+
     function roleImageCandidates(role) {
       const roleSlug = toRoleSlug(role);
       if (!roleSlug) return [];
@@ -975,6 +1040,38 @@
 
           img.onload = () => {
             state.operatorImageCache.set(op.id, src);
+            resolve(src);
+          };
+
+          img.onerror = tryNext;
+          img.src = src;
+        };
+
+        tryNext();
+      });
+    }
+
+    function resolveOperatorBgImage(op) {
+      if (state.operatorBgImageCache.has(op.id)) {
+        return Promise.resolve(state.operatorBgImageCache.get(op.id));
+      }
+
+      const candidates = operatorBgImageCandidates(op);
+      let index = 0;
+
+      return new Promise(resolve => {
+        const tryNext = () => {
+          if (index >= candidates.length) {
+            state.operatorBgImageCache.set(op.id, '');
+            resolve('');
+            return;
+          }
+
+          const src = candidates[index++];
+          const img = new Image();
+
+          img.onload = () => {
+            state.operatorBgImageCache.set(op.id, src);
             resolve(src);
           };
 
@@ -1233,6 +1330,7 @@
       state.selectedId = op.id;
 
       const imageSrc = await resolveOperatorImage(op);
+      const bgImageSrc = await resolveOperatorBgImage(op);
       const roleImageSrc = await resolveRoleImage(op.role);
       const roleTitle = op.role || 'Unknown';
       const roleDesc = op.roleDesc || op.bio || 'No role description available.';
@@ -1242,6 +1340,12 @@
       els.detailRoot.className = 'detail-root';
       els.detailRoot.innerHTML = `
         <div class="detail-wrap" style="${escapeHtml(roleStyleVars(theme))}">
+          ${bgImageSrc ? `
+            <div class="detail-bg-art">
+              <img src="${escapeHtml(bgImageSrc)}" alt="">
+            </div>
+          ` : ''}
+
           <div class="detail-header">
             <div class="detail-thumb">
               ${imageSrc

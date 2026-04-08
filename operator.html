@@ -418,7 +418,7 @@
       z-index:0;
       opacity:.95;
     }
-    
+
     .detail-bg-art img{
       width:100%;
       height:auto;
@@ -426,26 +426,6 @@
       display:block;
       filter:drop-shadow(0 10px 28px rgba(0,0,0,.30));
       opacity:.96;
-    }
-    
-    @media (max-width:760px){
-      .detail-bg-art{
-        width:min(52%, 240px);
-        top:6px;
-        right:6px;
-        max-height:195px;
-        opacity:.58;
-      }
-    }
-    
-    @media (max-width:560px){
-      .detail-bg-art{
-        width:min(45%, 165px);
-        top:4px;
-        right:4px;
-        max-height:135px;
-        opacity:.44;
-      }
     }
 
     .detail-header,
@@ -694,11 +674,11 @@
       }
 
       .detail-bg-art{
-        width:min(48%, 220px);
-        top:8px;
-        right:8px;
-        max-height:180px;
-        opacity:.56;
+        width:min(52%, 240px);
+        top:6px;
+        right:6px;
+        max-height:195px;
+        opacity:.58;
       }
 
       .detail-header{
@@ -777,11 +757,11 @@
       }
 
       .detail-bg-art{
-        width:min(42%, 150px);
-        top:6px;
-        right:6px;
-        max-height:125px;
-        opacity:.42;
+        width:min(45%, 165px);
+        top:4px;
+        right:4px;
+        max-height:135px;
+        opacity:.44;
       }
     }
 
@@ -867,19 +847,19 @@
 
     const KNOWN_OPERATOR_SLUGS = [
       'd-wolf',
-      'gizmo',
-      'hackclaw',
-      'luna',
-      'nox',
-      'raptor',
       'shepherd',
-      'sineva',
+      'luna',
       'stinger',
-      'tempest',
-      'toxik',
+      'vyron',
+      'hackclaw',
       'uluru',
+      'sineva',
+      'toxik',
+      'nox',
+      'tempest',
       'vlinder',
-      'vyron'
+      'gizmo',
+      'raptor'
     ];
 
     const KNOWN_ROLE_SLUGS = [
@@ -888,6 +868,13 @@
       'engineer',
       'recon'
     ];
+
+    const ROLE_ANALYSIS = {
+      assault: "In tournament play, Assault operators are your frontline tempo setters. They thrive in fast breaks, opening duels, and pressure-heavy executes, making them ideal for teams that want to force space early and take control of fights before the enemy can stabilize.",
+      engineer: "In esports, Engineer operators bring structure and utility value. They are strongest in disciplined setups, defensive holds, and vehicle or objective-heavy situations, giving teams more staying power, better area control, and stronger answers to drawn-out engagements.",
+      recon: "For competitive play, Recon operators are all about information advantage. They help teams scout rotations, confirm enemy positioning, and make cleaner macro decisions, which is especially valuable for coordinated squads that win through preparation and map awareness.",
+      support: "In tournaments, Support operators are the backbone of team consistency. They keep squads in fighting shape during extended skirmishes, improve recovery between trades, and add stability in messy situations, making them essential for teams that rely on endurance and coordinated resets."
+    };
 
     const PLACEHOLDER_TEXT = 'Description placeholder — to be added later.';
 
@@ -1353,9 +1340,13 @@
       const bgImageSrc = await resolveOperatorBgImage(op);
       const roleImageSrc = await resolveRoleImage(op.role);
       const roleTitle = op.role || 'Unknown';
-      const roleDesc = op.roleDesc || op.bio || 'No role description available.';
       const chips = [op.role, op.faction, op.origin].filter(Boolean);
       const theme = getRoleTheme(op.role);
+      const roleDesc =
+        ROLE_ANALYSIS[theme.slug] ||
+        op.roleDesc ||
+        op.bio ||
+        'No role description available.';
 
       els.detailRoot.className = 'detail-root';
       els.detailRoot.innerHTML = `

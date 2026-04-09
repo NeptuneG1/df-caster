@@ -15,18 +15,28 @@
     :root{
       --bg:#030507;
       --panel:rgba(0,255,200,.06);
-      --panel-strong:rgba(0,255,200,.09);
       --line:rgba(0,255,200,.22);
       --line-soft:rgba(255,255,255,.10);
       --ink:#f3fffb;
       --muted:#9ed9ca;
       --brand:#00ffc8;
       --brand-soft:#7fffe6;
-      --green:#0fed94;
+      --green:#6dff8a;
       --shadow:0 20px 60px rgba(0,0,0,.42);
       --radius:18px;
       --radius-lg:28px;
-      --max:1500px;
+      --max:1600px;
+
+      --ops:#21e6f5;
+      --large:#23e28f;
+      --medium:#efcc61;
+      --small:#ff3b63;
+    }
+
+    html,
+    body{
+      height:100%;
+      overflow:hidden;
     }
 
     html{
@@ -34,14 +44,14 @@
     }
 
     body{
-      min-height:100vh;
+      min-height:100dvh;
       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--ink);
       background:
-        linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.78)),
+        linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.74)),
         url('https://i.imgur.com/TytkDtb.png') no-repeat center center fixed;
       background-size:cover;
-      overflow-x:hidden;
+      overflow:hidden;
     }
 
     body::before{
@@ -50,811 +60,1094 @@
       inset:0;
       pointer-events:none;
       background:
-        radial-gradient(circle at top center, rgba(0,255,200,.12), transparent 34%),
-        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.16));
+        radial-gradient(circle at top center, rgba(0,255,200,.16), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.14));
       z-index:0;
     }
 
-    .page{
+    #preloader{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:18px;
+      background:#000;
+      z-index:9999;
+      transition:opacity .35s ease, visibility .35s ease;
+    }
+
+    #preloader.hidden{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+
+    .loader{
+      width:66px;
+      height:66px;
+      border-radius:50%;
+      border:6px solid rgba(0,255,200,.18);
+      border-top-color:var(--brand);
+      animation:spin 1s linear infinite;
+      box-shadow:0 0 22px rgba(0,255,200,.18);
+    }
+
+    @keyframes spin{
+      from{transform:rotate(0deg);}
+      to{transform:rotate(360deg);}
+    }
+
+    .shell{
       position:relative;
       z-index:1;
       max-width:var(--max);
       margin:0 auto;
-      padding:18px;
-    }
-
-    .df-header-shell{
-      position:sticky;
-      top:16px;
-      z-index:30;
-      width:100%;
-      min-height:84px;
-      padding:12px 18px;
-      border:1px solid rgba(0,255,200,.18);
-      border-radius:24px;
-      background:
-        linear-gradient(180deg, rgba(0,255,200,.05), rgba(0,255,200,.02)),
-        rgba(3,10,12,.72);
-      backdrop-filter:blur(12px);
-      box-shadow:0 20px 60px rgba(0,0,0,.38);
+      height:100dvh;
+      padding:18px 20px;
+      display:grid;
+      grid-template-rows:auto auto minmax(0,1fr);
+      gap:16px;
       overflow:hidden;
-      margin-bottom:18px;
     }
 
-    .df-header-shell::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at center, rgba(0,255,200,.10), transparent 30%),
-        linear-gradient(90deg, rgba(255,255,255,.02), rgba(255,255,255,0));
-      opacity:.9;
-    }
-
-    .df-header-inner{
-      position:relative;
-      z-index:1;
+    .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:18px;
-      min-height:58px;
+      gap:20px;
+      padding:4px 0 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      min-height:0;
     }
 
-    .df-brand-wrap{
-      flex:0 0 auto;
-      min-width:220px;
-      max-width:320px;
-    }
-
-    .df-brand-btn{
-      display:block;
-      width:100%;
-      border:0;
-      background:transparent;
-      color:inherit;
-      padding:0;
-      margin:0;
-      cursor:pointer;
-    }
-
-    .df-brand{
-      --logo-font-size: clamp(1.2rem, 2vw, 1.55rem);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      width:100%;
-      min-width:0;
-      font-weight:800;
-    }
-
-    .df-brand-main{
-      display:block;
-      width:100%;
-      text-align:center;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      font-family:'Orbitron',sans-serif;
-      font-size:var(--logo-font-size);
-      line-height:1.05;
-      letter-spacing:2px;
-      color:#f2fffb;
-      text-shadow:0 0 12px rgba(0,255,200,.18);
-    }
-
-    .df-brand-sub{
+    .brand{
       display:flex;
       align-items:center;
-      justify-content:center;
-      margin-top:-2px;
-      white-space:nowrap;
+      gap:16px;
       min-width:0;
-      width:100%;
-      gap:0;
     }
 
-    .df-brand-subtext{
-      font-family:'Orbitron',sans-serif;
-      color:#0fed94;
-      font-size:calc(var(--logo-font-size) * .72);
-      margin:0 calc(var(--logo-font-size) * .28);
-      letter-spacing:2px;
-    }
-
-    .df-brand-chevron{
-      width:calc(var(--logo-font-size) * .78);
-      height:calc(var(--logo-font-size) * .78);
-      fill:rgba(200,210,210,.82);
+    .brand img{
+      width:74px;
+      max-width:100%;
+      filter:drop-shadow(0 0 10px rgba(0,255,200,.35));
       flex:0 0 auto;
     }
 
-    .df-brand-chevron.left{
-      transform:rotate(-90deg);
-      margin-right:calc(var(--logo-font-size) * -.18);
+    .brand-copy{
+      min-width:0;
     }
 
-    .df-brand-chevron.right{
-      transform:rotate(90deg);
-      margin-left:calc(var(--logo-font-size) * -.18);
+    .eyebrow{
+      font-family:'Orbitron',sans-serif;
+      letter-spacing:2px;
+      font-size:11px;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:5px;
     }
 
-    .df-header-center{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-50%);
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:nowrap;
-      z-index:2;
+    .brand-copy h1{
+      font-family:'Orbitron',sans-serif;
+      font-size:clamp(1.8rem,3vw,3.3rem);
+      letter-spacing:4px;
+      line-height:1;
+      color:var(--brand);
+      text-shadow:0 0 12px rgba(0,255,200,.28), 0 0 24px rgba(0,255,200,.10);
     }
 
-    .df-nav-btn,
-    .df-nav-select{
-      height:38px;
-      border-radius:12px;
-      border:1px solid rgba(0,255,200,.14);
-      background:rgba(10,20,24,.62);
-      color:#eafcf7;
-      font:600 0.95rem Inter,system-ui,sans-serif;
-      transition:background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
-    }
-
-    .df-nav-btn{
-      padding:0 14px;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-
-    .df-nav-btn:hover,
-    .df-nav-select:hover{
-      background:rgba(19,99,67,.45);
-      border-color:rgba(0,255,200,.24);
-      box-shadow:0 0 0 2px rgba(0,255,200,.06);
-    }
-
-    .df-nav-btn:active{
-      transform:translateY(1px);
-    }
-
-    .df-nav-select-wrap{
-      position:relative;
-      min-width:190px;
-    }
-
-    .df-nav-select{
-      width:100%;
-      padding:0 40px 0 14px;
-      appearance:none;
-      outline:none;
-      cursor:pointer;
-    }
-
-    .df-nav-select:focus{
-      border-color:#00ffc8;
-      box-shadow:0 0 0 3px rgba(0,255,200,.10);
-    }
-
-    .df-nav-chevron{
-      position:absolute;
-      right:12px;
-      top:50%;
-      transform:translateY(-50%);
-      pointer-events:none;
-      width:18px;
-      height:18px;
-      stroke:#fff;
-      opacity:.9;
-    }
-
-    .df-nav-btn.icon{
+    .status-chip{
+      flex:0 0 auto;
       display:inline-flex;
       align-items:center;
       gap:8px;
+      padding:9px 13px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,255,200,.08);
+      color:var(--brand-soft);
+      box-shadow:var(--shadow);
+      font-size:.84rem;
+      white-space:nowrap;
     }
 
-    .df-nav-btn svg{
-      width:16px;
-      height:16px;
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--brand);
+      box-shadow:0 0 10px var(--brand);
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns:minmax(220px,1.15fr) minmax(170px,.52fr) auto;
+      gap:12px;
+      min-height:0;
+    }
+
+    .field,.select,.ghost-btn{
+      min-height:46px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(0,8,8,.66);
+      color:var(--ink);
+      box-shadow:var(--shadow);
+      font-size:.92rem;
+    }
+
+    .field,.select{
+      width:100%;
+      padding:0 15px;
+      outline:none;
+    }
+
+    .field::placeholder{
+      color:rgba(191,254,243,.48);
+    }
+
+    .field:focus,.select:focus{
+      border-color:var(--brand);
+      box-shadow:0 0 0 3px rgba(0,255,200,.10), var(--shadow);
+    }
+
+    .ghost-btn{
+      padding:0 16px;
+      font-weight:700;
+      color:var(--brand);
+      cursor:pointer;
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .ghost-btn:hover{
+      transform:translateY(-1px);
+      border-color:var(--brand);
+      box-shadow:0 0 0 2px rgba(0,255,200,.08), var(--shadow);
+    }
+
+    .layout{
+      min-height:0;
+      display:grid;
+      grid-template-columns:390px minmax(0,1fr);
+      gap:18px;
+      overflow:hidden;
+    }
+
+    .panel{
+      background:linear-gradient(180deg, rgba(0,255,200,.05), rgba(0,255,200,.02));
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      backdrop-filter:blur(10px);
+      box-shadow:var(--shadow);
+      min-height:0;
+    }
+
+    .list-panel{
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .results-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:0 4px 12px;
+      color:var(--muted);
+      font-size:.9rem;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      margin-bottom:12px;
       flex:0 0 auto;
     }
 
-    .df-nav-btn.support svg{
-      color:#0fed94;
-      fill:currentColor;
-    }
-
-    .df-header-spacer{
-      flex:0 0 240px;
-    }
-
-    .hero{
+    .map-list{
+      flex:1 1 auto;
+      min-height:0;
+      overflow:auto;
+      padding-right:4px;
       display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:18px;
-      margin-bottom:18px;
-    }
-
-    .hero-main,
-    .hero-side,
-    .section-panel{
-      border:1px solid var(--line);
-      border-radius:28px;
-      background:
-        linear-gradient(180deg, rgba(0,255,200,.05), rgba(0,255,200,.02)),
-        rgba(3,10,12,.72);
-      backdrop-filter:blur(12px);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-
-    .hero-main{
-      min-height:420px;
-      padding:34px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-    }
-
-    .hero-main::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 72% 30%, rgba(0,255,200,.14), transparent 24%),
-        linear-gradient(90deg, rgba(255,255,255,.02), transparent 40%);
-    }
-
-    .hero-kicker{
-      position:relative;
-      z-index:1;
-      color:var(--muted);
-      font-family:'Orbitron',sans-serif;
-      font-size:.84rem;
-      letter-spacing:2px;
-      text-transform:uppercase;
-      margin-bottom:12px;
-    }
-
-    .hero-title{
-      position:relative;
-      z-index:1;
-      font-family:'Orbitron',sans-serif;
-      font-size:clamp(2.2rem, 5vw, 4.6rem);
-      line-height:.95;
-      letter-spacing:2px;
-      color:#fff;
-      text-transform:uppercase;
-      max-width:780px;
-      margin-bottom:16px;
-    }
-
-    .hero-title .accent{
-      color:var(--brand);
-      text-shadow:0 0 14px rgba(0,255,200,.18);
-    }
-
-    .hero-desc{
-      position:relative;
-      z-index:1;
-      max-width:720px;
-      color:#d7fff6;
-      font-size:1rem;
-      line-height:1.6;
-      margin-bottom:24px;
-    }
-
-    .hero-actions{
-      position:relative;
-      z-index:1;
-      display:flex;
       gap:12px;
-      flex-wrap:wrap;
+      align-content:start;
     }
 
-    .cta{
-      min-height:44px;
-      padding:0 18px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(0,255,200,.09);
-      color:#f6fffc;
-      font:700 .95rem Inter,system-ui,sans-serif;
+    .map-list::-webkit-scrollbar,
+    .detail-root::-webkit-scrollbar{
+      width:10px;
+      height:10px;
+    }
+
+    .map-list::-webkit-scrollbar-thumb,
+    .detail-root::-webkit-scrollbar-thumb{
+      background:rgba(0,255,200,.16);
+      border-radius:999px;
+    }
+
+    .map-card{
+      display:grid;
+      grid-template-columns:82px minmax(0,1fr);
+      gap:12px;
+      align-items:center;
+      padding:11px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,255,200,.045);
       cursor:pointer;
       transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
     }
 
-    .cta:hover{
-      transform:translateY(-1px);
-      border-color:rgba(0,255,200,.34);
-      box-shadow:0 0 0 2px rgba(0,255,200,.08);
-      background:rgba(0,255,200,.14);
+    .map-card:hover,
+    .map-card.active{
+      transform:translateY(-2px);
+      border-color:var(--map-color, var(--brand));
+      box-shadow:0 0 0 2px var(--map-border, rgba(0,255,200,.12)), 0 18px 38px rgba(0,0,0,.25);
+      background:rgba(0,255,200,.065);
     }
 
-    .cta.ghost{
-      background:rgba(255,255,255,.03);
-    }
-
-    .hero-side{
-      min-height:420px;
-      padding:26px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-      justify-content:center;
-    }
-
-    .side-card{
-      border:1px solid rgba(0,255,200,.12);
-      background:rgba(0,255,200,.04);
-      border-radius:20px;
-      padding:18px;
-    }
-
-    .side-label{
-      color:var(--muted);
-      font-size:.76rem;
-      text-transform:uppercase;
-      letter-spacing:1.5px;
-      font-family:'Orbitron',sans-serif;
-      margin-bottom:8px;
-    }
-
-    .side-title{
-      font-family:'Orbitron',sans-serif;
-      color:#fff;
-      font-size:1.15rem;
-      margin-bottom:8px;
-    }
-
-    .side-text{
-      color:#d3fbf2;
-      font-size:.94rem;
-      line-height:1.5;
-    }
-
-    .maps-section{
-      margin-bottom:18px;
-    }
-
-    .section-panel{
-      padding:22px;
-    }
-
-    .section-head{
-      display:flex;
-      align-items:end;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:18px;
-    }
-
-    .section-title{
-      font-family:'Orbitron',sans-serif;
-      font-size:1.35rem;
-      color:#fff;
-      letter-spacing:1px;
-      text-transform:uppercase;
-    }
-
-    .section-sub{
-      color:var(--muted);
-      font-size:.92rem;
-      margin-top:6px;
-    }
-
-    .map-grid{
-      display:grid;
-      grid-template-columns:repeat(5, minmax(0,1fr));
-      gap:14px;
-    }
-
-    .map-card{
-      position:relative;
-      min-height:250px;
-      border-radius:22px;
+    .thumb{
+      width:82px;
+      height:82px;
+      border-radius:16px;
       overflow:hidden;
       border:1px solid rgba(0,255,200,.14);
       background:
-        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.46)),
-        radial-gradient(circle at center, rgba(0,255,200,.14), transparent 36%),
-        #0a1518;
-      display:flex;
-      align-items:flex-end;
-      cursor:pointer;
-      transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        radial-gradient(circle at 50% 18%, rgba(0,255,200,.18), transparent 36%),
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.35)),
+        #081418;
+      flex:0 0 auto;
     }
 
-    .map-card:hover{
-      transform:translateY(-3px);
-      border-color:rgba(0,255,200,.30);
-      box-shadow:0 20px 40px rgba(0,0,0,.28);
-    }
-
-    .map-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0) 22%),
-        linear-gradient(0deg, rgba(0,0,0,.58), rgba(0,0,0,.02) 42%);
-      pointer-events:none;
-    }
-
-    .map-art{
-      position:absolute;
-      inset:0;
-      background-size:cover;
-      background-position:center;
-      opacity:.72;
-      transform:scale(1.02);
-    }
-
-    .map-copy{
-      position:relative;
-      z-index:1;
-      padding:16px;
+    .thumb img{
       width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
     }
 
-    .map-name{
+    .thumb-placeholder{
+      width:100%;
+      height:100%;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:8px;
+      font-family:'Orbitron',sans-serif;
+      font-size:.72rem;
+      color:#ddfff8;
+      text-transform:uppercase;
+      line-height:1.1;
+    }
+
+    .card-copy{
+      min-width:0;
+    }
+
+    .type-chip{
+      display:inline-flex;
+      align-items:center;
+      padding:4px 9px;
+      border-radius:999px;
+      font-size:.68rem;
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      border:1px solid var(--map-border, rgba(0,255,200,.18));
+      background:var(--map-bg, rgba(0,255,200,.08));
+      color:var(--map-color, #c8fff5);
+      margin-bottom:8px;
+    }
+
+    .codename{
       font-family:'Orbitron',sans-serif;
       font-size:1rem;
-      color:#fff;
+      line-height:1.15;
+      color:var(--ink);
       text-transform:uppercase;
       letter-spacing:1px;
+      word-break:break-word;
+    }
+
+    .realname{
+      margin-top:5px;
+      color:var(--green);
+      font-size:.84rem;
+      line-height:1.2;
+      word-break:break-word;
+    }
+
+    .detail-panel{
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .detail-root{
+      height:100%;
+      min-height:0;
+      overflow:auto;
+    }
+
+    .detail-empty{
+      height:100%;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:24px;
+      color:#d9fff9;
+    }
+
+    .detail-wrap{
+      position:relative;
+      padding:24px 26px;
+      min-height:100%;
+      overflow:hidden;
+    }
+
+    .detail-bg-art{
+      position:absolute;
+      top:8px;
+      right:8px;
+      width:min(50%, 500px);
+      max-height:360px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:flex-end;
+      pointer-events:none;
+      z-index:0;
+      opacity:.95;
+    }
+
+    .detail-bg-art img{
+      width:100%;
+      height:auto;
+      object-fit:contain;
+      display:block;
+      filter:drop-shadow(0 10px 28px rgba(0,0,0,.30));
+      opacity:.96;
+    }
+
+    .detail-header,
+    .separator,
+    .mini-chip-row,
+    .info-block{
+      position:relative;
+      z-index:1;
+    }
+
+    .detail-header{
+      display:grid;
+      grid-template-columns:96px minmax(0,1fr);
+      gap:16px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .detail-thumb{
+      width:96px;
+      height:96px;
+      border-radius:20px;
+      overflow:hidden;
+      border:1px solid rgba(0,255,200,.16);
+      background:
+        radial-gradient(circle at 50% 18%, rgba(0,255,200,.18), transparent 36%),
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.35)),
+        #081418;
+    }
+
+    .detail-thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .detail-title h2{
+      font-family:'Orbitron',sans-serif;
+      font-size:clamp(1.9rem,3vw,3.2rem);
+      line-height:1;
+      text-transform:uppercase;
+      color:#fff;
+      letter-spacing:1px;
+      margin-bottom:8px;
+      word-break:break-word;
+    }
+
+    .detail-title .name{
+      color:var(--green);
+      font-size:1.12rem;
+      line-height:1.25;
+      font-weight:600;
+    }
+
+    .separator{
+      height:1px;
+      background:rgba(255,255,255,.22);
+      margin:14px 0 16px;
+    }
+
+    .mini-chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:0 0 18px;
+    }
+
+    .mini-chip{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+      border:1px solid rgba(0,255,200,.16);
+      background:rgba(0,255,200,.07);
+      color:#cbfff6;
+    }
+
+    .info-block{
+      padding:2px 0 14px;
+    }
+
+    .info-block + .info-block{
+      border-top:1px solid rgba(255,255,255,.18);
+      padding-top:16px;
+      margin-top:2px;
+    }
+
+    .type-row{
+      display:grid;
+      grid-template-columns:72px minmax(0,1fr);
+      gap:14px;
+      align-items:start;
+    }
+
+    .type-icon{
+      width:72px;
+      height:72px;
+      display:grid;
+      place-items:center;
+      border-radius:16px;
+      background:var(--map-bg, rgba(0,255,200,.06));
+      border:1px solid var(--map-border, rgba(0,255,200,.16));
+      overflow:hidden;
+      font-family:'Orbitron',sans-serif;
+      font-size:1.1rem;
+      color:var(--map-color, #fff);
+      text-transform:uppercase;
+    }
+
+    .type-label{
+      display:block;
+      font-family:'Orbitron',sans-serif;
+      color:var(--map-color, #fff);
+      font-size:1rem;
+      letter-spacing:1px;
+      text-transform:uppercase;
       margin-bottom:6px;
     }
 
-    .map-tag{
-      display:inline-flex;
-      align-items:center;
-      padding:5px 9px;
-      border-radius:999px;
-      border:1px solid rgba(0,255,200,.16);
-      background:rgba(0,255,200,.09);
-      color:#d9fff8;
-      font-size:.72rem;
-      text-transform:uppercase;
-      letter-spacing:.8px;
-    }
-
-    .about-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:14px;
-    }
-
-    .about-card{
-      border:1px solid rgba(0,255,200,.12);
-      background:rgba(0,255,200,.04);
-      border-radius:20px;
-      padding:18px;
-    }
-
-    .about-card h3{
+    .type-title{
       font-family:'Orbitron',sans-serif;
-      font-size:1rem;
+      color:var(--map-color, #fff);
+      font-size:1.75rem;
+      line-height:1.1;
+      text-transform:capitalize;
+      margin-bottom:6px;
+    }
+
+    .desc{
+      color:#f0f5f5;
+      font-size:.98rem;
+      line-height:1.32;
+      opacity:.96;
+    }
+
+    .ability-title{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.1rem;
+      line-height:1.18;
       color:#fff;
-      margin-bottom:8px;
-      text-transform:uppercase;
+      margin-bottom:7px;
     }
 
-    .about-card p{
-      color:#d4fbf3;
-      font-size:.94rem;
-      line-height:1.55;
+    .ability-desc{
+      color:#f2f2f2;
+      font-size:.98rem;
+      line-height:1.3;
+      opacity:.94;
     }
 
-    .footer{
-      padding:10px 4px 4px;
+    .empty-state,.error-state{
+      padding:24px;
       text-align:center;
-      color:#9fd8cb;
-      font-size:.84rem;
+      color:#d9fff9;
+      border:1px dashed rgba(0,255,200,.24);
+      border-radius:20px;
+      background:rgba(0,255,200,.03);
     }
 
-    @media (max-width: 1180px){
-      .df-header-inner{
-        flex-direction:column;
-        align-items:stretch;
-        gap:14px;
-      }
-
-      .df-brand-wrap,
-      .df-header-spacer{
-        min-width:0;
-        max-width:none;
-        flex:0 0 auto;
-      }
-
-      .df-header-center{
-        position:relative;
-        left:auto;
-        top:auto;
-        transform:none;
-        justify-content:center;
-        flex-wrap:wrap;
-      }
-
-      .hero{
-        grid-template-columns:1fr;
-      }
-
-      .map-grid{
-        grid-template-columns:repeat(3, minmax(0,1fr));
-      }
-
-      .about-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 760px){
-      .page{
-        padding:12px;
-      }
-
-      .df-header-shell{
-        padding:12px;
-        border-radius:18px;
-      }
-
-      .df-header-center{
-        gap:8px;
-      }
-
-      .df-nav-btn,
-      .df-nav-select{
-        height:36px;
-        font-size:.88rem;
-      }
-
-      .df-nav-btn{
-        padding:0 11px;
-      }
-
-      .df-nav-select-wrap{
-        min-width:160px;
-        width:100%;
-        max-width:220px;
-      }
-
-      .df-brand{
-        --logo-font-size: clamp(1.05rem, 5vw, 1.28rem);
-      }
-
-      .hero-main,
-      .hero-side,
-      .section-panel{
-        border-radius:20px;
-      }
-
-      .hero-main{
-        padding:22px;
-        min-height:unset;
-      }
-
-      .hero-side{
-        min-height:unset;
+    @media (max-width:1100px){
+      .shell{
         padding:16px;
       }
 
-      .map-grid{
+      .layout{
+        grid-template-columns:1fr;
+        grid-template-rows:minmax(190px, 34dvh) minmax(0,1fr);
+      }
+
+      .map-list{
         grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:10px;
       }
 
       .map-card{
-        min-height:210px;
+        grid-template-columns:1fr;
+        text-align:center;
+        gap:10px;
+        padding:12px 10px;
+        align-content:start;
+      }
+
+      .thumb{
+        width:100%;
+        max-width:106px;
+        height:106px;
+        margin:0 auto;
+      }
+
+      .type-chip{
+        margin:0 auto 8px;
       }
     }
 
-    @media (max-width: 460px){
-      .map-grid{
+    @media (max-width:760px){
+      .shell{
+        gap:12px;
+        padding:12px;
+      }
+
+      .topbar{
+        gap:12px;
+        padding-bottom:10px;
+      }
+
+      .brand img{
+        width:58px;
+      }
+
+      .brand-copy h1{
+        font-size:1.9rem;
+        letter-spacing:3px;
+      }
+
+      .status-chip{
+        font-size:.76rem;
+        padding:8px 11px;
+      }
+
+      .controls{
         grid-template-columns:1fr;
+        gap:10px;
+      }
+
+      .layout{
+        grid-template-rows:minmax(180px, 31dvh) minmax(0,1fr);
+      }
+
+      .detail-wrap{
+        padding:18px 16px 20px;
+      }
+
+      .detail-bg-art{
+        width:min(52%, 240px);
+        top:6px;
+        right:6px;
+        max-height:195px;
+        opacity:.58;
+      }
+
+      .detail-header{
+        grid-template-columns:80px minmax(0,1fr);
+        gap:12px;
+      }
+
+      .detail-thumb{
+        width:80px;
+        height:80px;
+      }
+
+      .detail-title h2{
+        font-size:1.8rem;
+      }
+
+      .detail-title .name{
+        font-size:1rem;
+      }
+
+      .type-row{
+        grid-template-columns:1fr;
+      }
+
+      .type-icon{
+        width:66px;
+        height:66px;
+      }
+
+      .type-title{
+        font-size:1.45rem;
+      }
+
+      .desc,
+      .ability-desc{
+        font-size:.92rem;
+      }
+
+      .ability-title{
+        font-size:1rem;
+      }
+    }
+
+    @media (max-width:560px){
+      .map-list{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+        gap:9px;
+      }
+
+      .map-card{
+        padding:10px 8px;
+        border-radius:18px;
+      }
+
+      .thumb{
+        max-width:88px;
+        height:88px;
+      }
+
+      .codename{
+        font-size:.84rem;
+      }
+
+      .realname{
+        font-size:.76rem;
+      }
+
+      .type-chip{
+        font-size:.62rem;
+        padding:4px 7px;
+      }
+
+      .detail-bg-art{
+        width:min(45%, 165px);
+        top:4px;
+        right:4px;
+        max-height:135px;
+        opacity:.44;
+      }
+    }
+
+    @media (max-width:380px){
+      .map-list{
+        grid-template-columns:1fr;
+      }
+
+      .layout{
+        grid-template-rows:minmax(170px, 30dvh) minmax(0,1fr);
       }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header class="df-header-shell">
-      <div class="df-header-inner">
-        <div class="df-brand-wrap">
-          <button type="button" class="df-brand-btn" aria-label="Go to home page" onclick="scrollToTopPage()">
-            <div class="df-brand">
-              <span class="df-brand-main">DELTAFORCE</span>
-              <div class="df-brand-sub">
-                <svg class="df-brand-chevron left" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
-                <svg class="df-brand-chevron left" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
-                <svg class="df-brand-chevron left" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
+  <div id="preloader">
+    <div class="loader"></div>
+    <p style="font-family:'Orbitron',sans-serif; letter-spacing:2px; color:#00ffc8;">Loading Map Database...</p>
+  </div>
 
-                <span class="df-brand-subtext">MAPS</span>
-
-                <svg class="df-brand-chevron right" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
-                <svg class="df-brand-chevron right" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
-                <svg class="df-brand-chevron right" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
-              </div>
-            </div>
-          </button>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="https://i.imgur.com/LtMzKj2.png" alt="Delta Force Logo">
+        <div class="brand-copy">
+          <div class="eyebrow">Tactical Reference</div>
+          <h1>DELTA FORCE</h1>
         </div>
+      </div>
 
-        <nav class="df-header-center" aria-label="Main Navigation">
-          <button class="df-nav-btn" type="button" onclick="scrollToTopPage()">Home</button>
-
-          <div class="df-nav-select-wrap">
-            <select id="mapSelect" class="df-nav-select" aria-label="Select Map">
-              <option value="" selected disabled hidden>Select Map</option>
-              <option value="zero-dam">Zero Dam</option>
-              <option value="layali-grove">Layali Grove</option>
-              <option value="space-city">Space City</option>
-              <option value="brakkesh">Brakkesh</option>
-              <option value="tide-prison">Tide Prison</option>
-            </select>
-
-            <svg class="df-nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-          </div>
-
-          <button class="df-nav-btn" type="button" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">About</button>
-
-          <button class="df-nav-btn icon" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
-            </svg>
-            Feedback
-          </button>
-
-          <button class="df-nav-btn icon support" type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
-            </svg>
-            Support Us
-          </button>
-        </nav>
-
-        <div class="df-header-spacer"></div>
+      <div class="status-chip">
+        <span class="status-dot"></span>
+        <span id="dbStatus">Map Database Ready</span>
       </div>
     </header>
 
-    <section class="hero">
-      <div class="hero-main">
-        <div class="hero-kicker">Tactical Reference Hub</div>
-        <h1 class="hero-title">Master the <span class="accent">Battlefield</span> One Map at a Time</h1>
-        <p class="hero-desc">
-          Explore official battlegrounds, break down tactical identities, and build cleaner map awareness for competitive play.
-          This custom Delta Force maps hub is styled to match your own neon sci-fi theme while keeping the navigation clean and tournament-friendly.
-        </p>
-        <div class="hero-actions">
-          <button class="cta" onclick="document.getElementById('maps').scrollIntoView({behavior:'smooth'})">Explore Maps</button>
-          <button class="cta ghost" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">Learn More</button>
-        </div>
-      </div>
+    <section class="controls">
+      <input id="searchInput" class="field" type="text" placeholder="Search map name, region, or notes..." />
+      <select id="typeFilter" class="select">
+        <option value="all">All map types</option>
+      </select>
+      <button id="refreshBtn" class="ghost-btn" type="button">Refresh Data</button>
+    </section>
 
-      <aside class="hero-side">
-        <div class="side-card">
-          <div class="side-label">Featured</div>
-          <div class="side-title">Tournament-Ready Layout</div>
-          <div class="side-text">Designed for esports-style presentation with clean navigation, map selection, and enough room to expand into analysis, callouts, rotations, or POI breakdowns later.</div>
+    <section class="layout">
+      <aside class="panel list-panel">
+        <div class="results-bar">
+          <div id="resultsText">Loading maps...</div>
+          <div id="resultsHint">All map types</div>
         </div>
-
-        <div class="side-card">
-          <div class="side-label">Flexible Build</div>
-          <div class="side-title">Ready for Expansion</div>
-          <div class="side-text">You can turn each map into its own page, add overlays, image hotspots, callout layers, or even integrate stat panels and team strategy notes.</div>
-        </div>
+        <div id="mapList" class="map-list"></div>
       </aside>
+
+      <section class="panel detail-panel">
+        <div id="detailRoot" class="detail-root detail-empty">Waiting for map data...</div>
+      </section>
     </section>
-
-    <section id="maps" class="maps-section">
-      <div class="section-panel">
-        <div class="section-head">
-          <div>
-            <div class="section-title">Map Directory</div>
-            <div class="section-sub">Select a battleground and drill into its tactical identity.</div>
-          </div>
-        </div>
-
-        <div class="map-grid">
-          <article class="map-card" id="zero-dam" onclick="openMap('Zero Dam')">
-            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80');"></div>
-            <div class="map-copy">
-              <div class="map-name">Zero Dam</div>
-              <span class="map-tag">Hydro Complex</span>
-            </div>
-          </article>
-
-          <article class="map-card" id="layali-grove" onclick="openMap('Layali Grove')">
-            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80');"></div>
-            <div class="map-copy">
-              <div class="map-name">Layali Grove</div>
-              <span class="map-tag">Green Zone</span>
-            </div>
-          </article>
-
-          <article class="map-card" id="space-city" onclick="openMap('Space City')">
-            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80');"></div>
-            <div class="map-copy">
-              <div class="map-name">Space City</div>
-              <span class="map-tag">Urban Sector</span>
-            </div>
-          </article>
-
-          <article class="map-card" id="brakkesh" onclick="openMap('Brakkesh')">
-            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80');"></div>
-            <div class="map-copy">
-              <div class="map-name">Brakkesh</div>
-              <span class="map-tag">Desert Front</span>
-            </div>
-          </article>
-
-          <article class="map-card" id="tide-prison" onclick="openMap('Tide Prison')">
-            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1200&q=80');"></div>
-            <div class="map-copy">
-              <div class="map-name">Tide Prison</div>
-              <span class="map-tag">Coastal Lockdown</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="about">
-      <div class="section-panel">
-        <div class="section-head">
-          <div>
-            <div class="section-title">About This Hub</div>
-            <div class="section-sub">Built to support map learning, production workflows, and competitive storytelling.</div>
-          </div>
-        </div>
-
-        <div class="about-grid">
-          <div class="about-card">
-            <h3>For Broadcast</h3>
-            <p>This layout works well for analyst desks, caster prep, and tournament support pages. It keeps your presentation polished while leaving space for data or tactical inserts.</p>
-          </div>
-
-          <div class="about-card">
-            <h3>For Players</h3>
-            <p>Use this as a map study page for route planning, POI callouts, common angles, and objective flow. It can easily grow into a full team prep tool.</p>
-          </div>
-
-          <div class="about-card">
-            <h3>For Expansion</h3>
-            <p>Each card can link to its own detailed page, interactive map, or strategy layer. You can also connect this to Supabase or JSON later for dynamic content loading.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer class="footer">
-      Delta Force Maps Hub — Custom themed landing page
-    </footer>
-  </div>
+  </main>
 
   <script>
-    function scrollToTopPage() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function openMap(mapName) {
-      alert(`Open map page for: ${mapName}`);
-    }
-
-    document.getElementById('mapSelect').addEventListener('change', function() {
-      const value = this.value;
-      if (!value) return;
-
-      const target = document.getElementById(value);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const MAPS = [
+      {
+        id: 'brakkesh',
+        name: 'Brakkesh',
+        subtitle: 'Desert stronghold and pressure-heavy combat zone.',
+        type: 'Large',
+        region: 'Desert',
+        image: './assets/img/map/large/brakkesh.webp',
+        bg: './assets/img/map/large/brakkesh.webp',
+        overview: 'Brakkesh favors long sightlines, split pressure, and decisive macro rotations. Teams that control open lanes and staging zones can dictate the pace of the round.',
+        analysis: [
+          {
+            title: 'Macro Focus',
+            desc: 'This map rewards teams that can manage spacing and timing across multiple fronts without overcommitting too early.'
+          },
+          {
+            title: 'Broadcast Angle',
+            desc: 'Brakkesh is strong for storytelling because repositioning, collapses, and long-range picks are easy to read for viewers.'
+          },
+          {
+            title: 'Tournament Read',
+            desc: 'Expect disciplined teams to use this map to stretch opponents thin, then punish late responses with well-timed collapses.'
+          }
+        ]
+      },
+      {
+        id: 'zero-dam',
+        name: 'Zero Dam',
+        subtitle: 'Tight hydro complex with layered vertical control.',
+        type: 'Operations',
+        region: 'Industrial',
+        image: './assets/img/map/op/zero-dam.webp',
+        bg: './assets/img/map/op/zero-dam.webp',
+        overview: 'Zero Dam emphasizes staging, choke control, and deliberate pushes through layered structures. Teams with cleaner entry timing and crossfire discipline gain a major edge.',
+        analysis: [
+          {
+            title: 'Macro Focus',
+            desc: 'Rotations matter as much as mechanics here. Small mistakes in approach timing can leave teams trapped in predictable lanes.'
+          },
+          {
+            title: 'Broadcast Angle',
+            desc: 'The map creates strong tension around bottlenecks and hold points, which makes execution sequences easy to follow on stream.'
+          },
+          {
+            title: 'Tournament Read',
+            desc: 'Strong teams will slow the pace, gather information, then hit with synchronized utility and close-range pressure.'
+          }
+        ]
+      },
+      {
+        id: 'layali-grove',
+        name: 'Layali Grove',
+        subtitle: 'Green terrain with flexible rotations and flank potential.',
+        type: 'Large',
+        region: 'Forest',
+        image: './assets/img/map/large/layali-grove.webp',
+        bg: './assets/img/map/large/layali-grove.webp',
+        overview: 'Layali Grove rewards teams that can disguise rotations and manipulate vision. Positioning and patience often matter more than raw opening aggression.',
+        analysis: [
+          {
+            title: 'Macro Focus',
+            desc: 'The map encourages varied pathing and off-angle pressure, so proactive information gathering becomes essential.'
+          },
+          {
+            title: 'Broadcast Angle',
+            desc: 'Flanks and late collapses create exciting momentum swings that can turn a quiet setup into a sudden wipe.'
+          },
+          {
+            title: 'Tournament Read',
+            desc: 'Teams that stay compact yet flexible will usually outperform squads that overextend for early control.'
+          }
+        ]
+      },
+      {
+        id: 'space-city',
+        name: 'Space City',
+        subtitle: 'Urban battlefield built around angles, cover, and layered paths.',
+        type: 'Operations',
+        region: 'Urban',
+        image: './assets/img/map/op/space-city.webp',
+        bg: './assets/img/map/op/space-city.webp',
+        overview: 'Space City is all about structure. Teams need disciplined peeking, lane awareness, and fast adaptation when pressure shifts between sectors.',
+        analysis: [
+          {
+            title: 'Macro Focus',
+            desc: 'Urban pathing means every sector can become a trap if spacing breaks down, so coordinated movement is critical.'
+          },
+          {
+            title: 'Broadcast Angle',
+            desc: 'The map gives observers clear before-and-after moments as teams move from setup into explosive contact.'
+          },
+          {
+            title: 'Tournament Read',
+            desc: 'Expect strong tactical teams to win through angle layering, coordinated pressure, and superior recovery after trades.'
+          }
+        ]
+      },
+      {
+        id: 'tide-prison',
+        name: 'Tide Prison',
+        subtitle: 'Coastal isolation map built for control and punishment.',
+        type: 'Medium',
+        region: 'Coastal',
+        image: './assets/img/map/medium/tide-prison.webp',
+        bg: './assets/img/map/medium/tide-prison.webp',
+        overview: 'Tide Prison emphasizes choke discipline and containment. Teams that establish position first can lock the tempo and force uncomfortable approaches from the opposition.',
+        analysis: [
+          {
+            title: 'Macro Focus',
+            desc: 'This map often becomes a test of patience and controlled denial rather than constant raw aggression.'
+          },
+          {
+            title: 'Broadcast Angle',
+            desc: 'Its tighter zones make every entry feel high stakes, which is strong for casting and replay storytelling.'
+          },
+          {
+            title: 'Tournament Read',
+            desc: 'Expect methodical teams to thrive here by setting layered holds and turning every enemy push into a resource drain.'
+          }
+        ]
       }
+    ];
+
+    const state = {
+      all: [...MAPS],
+      filtered: [...MAPS],
+      selectedId: MAPS[0]?.id || null
+    };
+
+    const els = {
+      preloader: document.getElementById('preloader'),
+      dbStatus: document.getElementById('dbStatus'),
+      searchInput: document.getElementById('searchInput'),
+      typeFilter: document.getElementById('typeFilter'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      resultsText: document.getElementById('resultsText'),
+      resultsHint: document.getElementById('resultsHint'),
+      mapList: document.getElementById('mapList'),
+      detailRoot: document.getElementById('detailRoot')
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function hexToRgba(hex, alpha) {
+      const clean = String(hex || '').replace('#', '');
+      if (clean.length !== 6) return `rgba(0,255,200,${alpha})`;
+      const r = parseInt(clean.slice(0, 2), 16);
+      const g = parseInt(clean.slice(2, 4), 16);
+      const b = parseInt(clean.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function getMapTheme(type) {
+      const t = String(type || '').toLowerCase();
+      if (t.includes('operations')) return { color: '#21e6f5', icon: 'OPS' };
+      if (t.includes('large')) return { color: '#23e28f', icon: 'LG' };
+      if (t.includes('medium')) return { color: '#efcc61', icon: 'MD' };
+      if (t.includes('small')) return { color: '#ff3b63', icon: 'SM' };
+      return { color: '#00ffc8', icon: 'MAP' };
+    }
+
+    function mapStyleVars(theme) {
+      return [
+        `--map-color:${theme.color}`,
+        `--map-bg:${hexToRgba(theme.color, 0.10)}`,
+        `--map-border:${hexToRgba(theme.color, 0.28)}`
+      ].join(';');
+    }
+
+    function populateTypeFilter() {
+      const types = [...new Set(state.all.map(m => m.type).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+      els.typeFilter.innerHTML = `
+        <option value="all">All map types</option>
+        ${types.map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join('')}
+      `;
+    }
+
+    function applyFilters() {
+      const query = els.searchInput.value.trim().toLowerCase();
+      const type = els.typeFilter.value;
+
+      state.filtered = state.all.filter(map => {
+        const haystack = [
+          map.name,
+          map.subtitle,
+          map.type,
+          map.region,
+          map.overview,
+          ...map.analysis.flatMap(x => [x.title, x.desc])
+        ].join(' ').toLowerCase();
+
+        const matchesSearch = !query || haystack.includes(query);
+        const matchesType = type === 'all' || map.type === type;
+        return matchesSearch && matchesType;
+      });
+
+      if (!state.filtered.some(map => map.id === state.selectedId)) {
+        state.selectedId = state.filtered[0]?.id || null;
+      }
+
+      els.resultsText.textContent = `${state.filtered.length} map${state.filtered.length === 1 ? '' : 's'}`;
+      els.resultsHint.textContent = type === 'all' ? 'All map types' : type;
+    }
+
+    function renderThumb(imageSrc, label) {
+      if (imageSrc) {
+        return `
+          <div class="thumb">
+            <img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(label)}" loading="lazy">
+          </div>
+        `;
+      }
+      return `
+        <div class="thumb">
+          <div class="thumb-placeholder">${escapeHtml(label)}</div>
+        </div>
+      `;
+    }
+
+    function renderMapList() {
+      if (!state.filtered.length) {
+        els.mapList.innerHTML = `<div class="empty-state">No maps matched your current filters.</div>`;
+        return;
+      }
+
+      els.mapList.innerHTML = state.filtered.map(map => {
+        const theme = getMapTheme(map.type);
+        return `
+          <article class="map-card ${map.id === state.selectedId ? 'active' : ''}" data-id="${escapeHtml(map.id)}" style="${escapeHtml(mapStyleVars(theme))}">
+            ${renderThumb(map.image, map.name)}
+            <div class="card-copy">
+              ${map.type ? `<div class="type-chip">${escapeHtml(map.type)}</div>` : ''}
+              <div class="codename">${escapeHtml(map.name)}</div>
+              ${map.region ? `<div class="realname">${escapeHtml(map.region)}</div>` : ''}
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      els.mapList.querySelectorAll('.map-card').forEach(card => {
+        card.addEventListener('click', () => {
+          state.selectedId = card.dataset.id;
+          renderAll();
+        });
+      });
+    }
+
+    function renderDetail() {
+      const map =
+        state.filtered.find(x => x.id === state.selectedId) ||
+        state.all.find(x => x.id === state.selectedId) ||
+        state.filtered[0] ||
+        state.all[0];
+
+      if (!map) {
+        els.detailRoot.className = 'detail-root detail-empty';
+        els.detailRoot.textContent = 'No map selected.';
+        return;
+      }
+
+      state.selectedId = map.id;
+
+      const theme = getMapTheme(map.type);
+
+      els.detailRoot.className = 'detail-root';
+      els.detailRoot.innerHTML = `
+        <div class="detail-wrap" style="${escapeHtml(mapStyleVars(theme))}">
+          ${map.bg ? `
+            <div class="detail-bg-art">
+              <img src="${escapeHtml(map.bg)}" alt="" loading="lazy">
+            </div>
+          ` : ''}
+
+          <div class="detail-header">
+            <div class="detail-thumb">
+              ${map.image
+                ? `<img src="${escapeHtml(map.image)}" alt="${escapeHtml(map.name)}" loading="lazy">`
+                : `<div class="thumb-placeholder">${escapeHtml(map.name)}</div>`}
+            </div>
+
+            <div class="detail-title">
+              <h2>${escapeHtml(map.name)}</h2>
+              ${map.subtitle ? `<div class="name">${escapeHtml(map.subtitle)}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="separator"></div>
+
+          <div class="mini-chip-row">
+            ${map.type ? `<span class="mini-chip">${escapeHtml(map.type)}</span>` : ''}
+            ${map.region ? `<span class="mini-chip">${escapeHtml(map.region)}</span>` : ''}
+          </div>
+
+          <div class="info-block">
+            <div class="type-row">
+              <div class="type-icon">${escapeHtml(theme.icon)}</div>
+              <div>
+                <span class="type-label">Map Type</span>
+                <div class="type-title">${escapeHtml(map.type || 'Unknown')}</div>
+                <div class="desc">${escapeHtml(map.overview || 'No map overview available.')}</div>
+              </div>
+            </div>
+          </div>
+
+          ${map.analysis.map(item => `
+            <div class="info-block">
+              <div class="ability-title">${escapeHtml(item.title)}</div>
+              <div class="ability-desc">${escapeHtml(item.desc)}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      applyFilters();
+      renderMapList();
+      renderDetail();
+    }
+
+    function refreshData() {
+      state.all = [...MAPS].sort((a,b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      state.selectedId = state.all[0]?.id || null;
+      populateTypeFilter();
+      renderAll();
+      els.dbStatus.textContent = `Map Database Ready — ${state.all.length} maps loaded`;
+    }
+
+    els.searchInput.addEventListener('input', renderAll);
+    els.typeFilter.addEventListener('change', renderAll);
+    els.refreshBtn.addEventListener('click', refreshData);
+
+    window.addEventListener('load', () => {
+      refreshData();
+      setTimeout(() => els.preloader.classList.add('hidden'), 350);
     });
   </script>
 </body>

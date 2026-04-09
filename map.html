@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delta Force — Maps</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    :root{
+      --bg:#030507;
+      --panel:rgba(0,255,200,.06);
+      --panel-strong:rgba(0,255,200,.09);
+      --line:rgba(0,255,200,.22);
+      --line-soft:rgba(255,255,255,.10);
+      --ink:#f3fffb;
+      --muted:#9ed9ca;
+      --brand:#00ffc8;
+      --brand-soft:#7fffe6;
+      --green:#0fed94;
+      --shadow:0 20px 60px rgba(0,0,0,.42);
+      --radius:18px;
+      --radius-lg:28px;
+      --max:1500px;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      min-height:100vh;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--ink);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.38), rgba(0,0,0,.78)),
+        url('https://i.imgur.com/TytkDtb.png') no-repeat center center fixed;
+      background-size:cover;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at top center, rgba(0,255,200,.12), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.16));
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      max-width:var(--max);
+      margin:0 auto;
+      padding:18px;
+    }
+
+    .df-header-shell{
+      position:sticky;
+      top:16px;
+      z-index:30;
+      width:100%;
+      min-height:84px;
+      padding:12px 18px;
+      border:1px solid rgba(0,255,200,.18);
+      border-radius:24px;
+      background:
+        linear-gradient(180deg, rgba(0,255,200,.05), rgba(0,255,200,.02)),
+        rgba(3,10,12,.72);
+      backdrop-filter:blur(12px);
+      box-shadow:0 20px 60px rgba(0,0,0,.38);
+      overflow:hidden;
+      margin-bottom:18px;
+    }
+
+    .df-header-shell::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at center, rgba(0,255,200,.10), transparent 30%),
+        linear-gradient(90deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+      opacity:.9;
+    }
+
+    .df-header-inner{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      min-height:58px;
+    }
+
+    .df-brand-wrap{
+      flex:0 0 auto;
+      min-width:220px;
+      max-width:320px;
+    }
+
+    .df-brand-btn{
+      display:block;
+      width:100%;
+      border:0;
+      background:transparent;
+      color:inherit;
+      padding:0;
+      margin:0;
+      cursor:pointer;
+    }
+
+    .df-brand{
+      --logo-font-size: clamp(1.2rem, 2vw, 1.55rem);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      min-width:0;
+      font-weight:800;
+    }
+
+    .df-brand-main{
+      display:block;
+      width:100%;
+      text-align:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-family:'Orbitron',sans-serif;
+      font-size:var(--logo-font-size);
+      line-height:1.05;
+      letter-spacing:2px;
+      color:#f2fffb;
+      text-shadow:0 0 12px rgba(0,255,200,.18);
+    }
+
+    .df-brand-sub{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:-2px;
+      white-space:nowrap;
+      min-width:0;
+      width:100%;
+      gap:0;
+    }
+
+    .df-brand-subtext{
+      font-family:'Orbitron',sans-serif;
+      color:#0fed94;
+      font-size:calc(var(--logo-font-size) * .72);
+      margin:0 calc(var(--logo-font-size) * .28);
+      letter-spacing:2px;
+    }
+
+    .df-brand-chevron{
+      width:calc(var(--logo-font-size) * .78);
+      height:calc(var(--logo-font-size) * .78);
+      fill:rgba(200,210,210,.82);
+      flex:0 0 auto;
+    }
+
+    .df-brand-chevron.left{
+      transform:rotate(-90deg);
+      margin-right:calc(var(--logo-font-size) * -.18);
+    }
+
+    .df-brand-chevron.right{
+      transform:rotate(90deg);
+      margin-left:calc(var(--logo-font-size) * -.18);
+    }
+
+    .df-header-center{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:nowrap;
+      z-index:2;
+    }
+
+    .df-nav-btn,
+    .df-nav-select{
+      height:38px;
+      border-radius:12px;
+      border:1px solid rgba(0,255,200,.14);
+      background:rgba(10,20,24,.62);
+      color:#eafcf7;
+      font:600 0.95rem Inter,system-ui,sans-serif;
+      transition:background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+    }
+
+    .df-nav-btn{
+      padding:0 14px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .df-nav-btn:hover,
+    .df-nav-select:hover{
+      background:rgba(19,99,67,.45);
+      border-color:rgba(0,255,200,.24);
+      box-shadow:0 0 0 2px rgba(0,255,200,.06);
+    }
+
+    .df-nav-btn:active{
+      transform:translateY(1px);
+    }
+
+    .df-nav-select-wrap{
+      position:relative;
+      min-width:190px;
+    }
+
+    .df-nav-select{
+      width:100%;
+      padding:0 40px 0 14px;
+      appearance:none;
+      outline:none;
+      cursor:pointer;
+    }
+
+    .df-nav-select:focus{
+      border-color:#00ffc8;
+      box-shadow:0 0 0 3px rgba(0,255,200,.10);
+    }
+
+    .df-nav-chevron{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      pointer-events:none;
+      width:18px;
+      height:18px;
+      stroke:#fff;
+      opacity:.9;
+    }
+
+    .df-nav-btn.icon{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .df-nav-btn svg{
+      width:16px;
+      height:16px;
+      flex:0 0 auto;
+    }
+
+    .df-nav-btn.support svg{
+      color:#0fed94;
+      fill:currentColor;
+    }
+
+    .df-header-spacer{
+      flex:0 0 240px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .hero-main,
+    .hero-side,
+    .section-panel{
+      border:1px solid var(--line);
+      border-radius:28px;
+      background:
+        linear-gradient(180deg, rgba(0,255,200,.05), rgba(0,255,200,.02)),
+        rgba(3,10,12,.72);
+      backdrop-filter:blur(12px);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-main{
+      min-height:420px;
+      padding:34px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .hero-main::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 72% 30%, rgba(0,255,200,.14), transparent 24%),
+        linear-gradient(90deg, rgba(255,255,255,.02), transparent 40%);
+    }
+
+    .hero-kicker{
+      position:relative;
+      z-index:1;
+      color:var(--muted);
+      font-family:'Orbitron',sans-serif;
+      font-size:.84rem;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .hero-title{
+      position:relative;
+      z-index:1;
+      font-family:'Orbitron',sans-serif;
+      font-size:clamp(2.2rem, 5vw, 4.6rem);
+      line-height:.95;
+      letter-spacing:2px;
+      color:#fff;
+      text-transform:uppercase;
+      max-width:780px;
+      margin-bottom:16px;
+    }
+
+    .hero-title .accent{
+      color:var(--brand);
+      text-shadow:0 0 14px rgba(0,255,200,.18);
+    }
+
+    .hero-desc{
+      position:relative;
+      z-index:1;
+      max-width:720px;
+      color:#d7fff6;
+      font-size:1rem;
+      line-height:1.6;
+      margin-bottom:24px;
+    }
+
+    .hero-actions{
+      position:relative;
+      z-index:1;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .cta{
+      min-height:44px;
+      padding:0 18px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(0,255,200,.09);
+      color:#f6fffc;
+      font:700 .95rem Inter,system-ui,sans-serif;
+      cursor:pointer;
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .cta:hover{
+      transform:translateY(-1px);
+      border-color:rgba(0,255,200,.34);
+      box-shadow:0 0 0 2px rgba(0,255,200,.08);
+      background:rgba(0,255,200,.14);
+    }
+
+    .cta.ghost{
+      background:rgba(255,255,255,.03);
+    }
+
+    .hero-side{
+      min-height:420px;
+      padding:26px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:center;
+    }
+
+    .side-card{
+      border:1px solid rgba(0,255,200,.12);
+      background:rgba(0,255,200,.04);
+      border-radius:20px;
+      padding:18px;
+    }
+
+    .side-label{
+      color:var(--muted);
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+      font-family:'Orbitron',sans-serif;
+      margin-bottom:8px;
+    }
+
+    .side-title{
+      font-family:'Orbitron',sans-serif;
+      color:#fff;
+      font-size:1.15rem;
+      margin-bottom:8px;
+    }
+
+    .side-text{
+      color:#d3fbf2;
+      font-size:.94rem;
+      line-height:1.5;
+    }
+
+    .maps-section{
+      margin-bottom:18px;
+    }
+
+    .section-panel{
+      padding:22px;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .section-title{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.35rem;
+      color:#fff;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+
+    .section-sub{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-top:6px;
+    }
+
+    .map-grid{
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .map-card{
+      position:relative;
+      min-height:250px;
+      border-radius:22px;
+      overflow:hidden;
+      border:1px solid rgba(0,255,200,.14);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.46)),
+        radial-gradient(circle at center, rgba(0,255,200,.14), transparent 36%),
+        #0a1518;
+      display:flex;
+      align-items:flex-end;
+      cursor:pointer;
+      transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .map-card:hover{
+      transform:translateY(-3px);
+      border-color:rgba(0,255,200,.30);
+      box-shadow:0 20px 40px rgba(0,0,0,.28);
+    }
+
+    .map-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0) 22%),
+        linear-gradient(0deg, rgba(0,0,0,.58), rgba(0,0,0,.02) 42%);
+      pointer-events:none;
+    }
+
+    .map-art{
+      position:absolute;
+      inset:0;
+      background-size:cover;
+      background-position:center;
+      opacity:.72;
+      transform:scale(1.02);
+    }
+
+    .map-copy{
+      position:relative;
+      z-index:1;
+      padding:16px;
+      width:100%;
+    }
+
+    .map-name{
+      font-family:'Orbitron',sans-serif;
+      font-size:1rem;
+      color:#fff;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      margin-bottom:6px;
+    }
+
+    .map-tag{
+      display:inline-flex;
+      align-items:center;
+      padding:5px 9px;
+      border-radius:999px;
+      border:1px solid rgba(0,255,200,.16);
+      background:rgba(0,255,200,.09);
+      color:#d9fff8;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.8px;
+    }
+
+    .about-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:14px;
+    }
+
+    .about-card{
+      border:1px solid rgba(0,255,200,.12);
+      background:rgba(0,255,200,.04);
+      border-radius:20px;
+      padding:18px;
+    }
+
+    .about-card h3{
+      font-family:'Orbitron',sans-serif;
+      font-size:1rem;
+      color:#fff;
+      margin-bottom:8px;
+      text-transform:uppercase;
+    }
+
+    .about-card p{
+      color:#d4fbf3;
+      font-size:.94rem;
+      line-height:1.55;
+    }
+
+    .footer{
+      padding:10px 4px 4px;
+      text-align:center;
+      color:#9fd8cb;
+      font-size:.84rem;
+    }
+
+    @media (max-width: 1180px){
+      .df-header-inner{
+        flex-direction:column;
+        align-items:stretch;
+        gap:14px;
+      }
+
+      .df-brand-wrap,
+      .df-header-spacer{
+        min-width:0;
+        max-width:none;
+        flex:0 0 auto;
+      }
+
+      .df-header-center{
+        position:relative;
+        left:auto;
+        top:auto;
+        transform:none;
+        justify-content:center;
+        flex-wrap:wrap;
+      }
+
+      .hero{
+        grid-template-columns:1fr;
+      }
+
+      .map-grid{
+        grid-template-columns:repeat(3, minmax(0,1fr));
+      }
+
+      .about-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 760px){
+      .page{
+        padding:12px;
+      }
+
+      .df-header-shell{
+        padding:12px;
+        border-radius:18px;
+      }
+
+      .df-header-center{
+        gap:8px;
+      }
+
+      .df-nav-btn,
+      .df-nav-select{
+        height:36px;
+        font-size:.88rem;
+      }
+
+      .df-nav-btn{
+        padding:0 11px;
+      }
+
+      .df-nav-select-wrap{
+        min-width:160px;
+        width:100%;
+        max-width:220px;
+      }
+
+      .df-brand{
+        --logo-font-size: clamp(1.05rem, 5vw, 1.28rem);
+      }
+
+      .hero-main,
+      .hero-side,
+      .section-panel{
+        border-radius:20px;
+      }
+
+      .hero-main{
+        padding:22px;
+        min-height:unset;
+      }
+
+      .hero-side{
+        min-height:unset;
+        padding:16px;
+      }
+
+      .map-grid{
+        grid-template-columns:repeat(2, minmax(0,1fr));
+      }
+
+      .map-card{
+        min-height:210px;
+      }
+    }
+
+    @media (max-width: 460px){
+      .map-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="df-header-shell">
+      <div class="df-header-inner">
+        <div class="df-brand-wrap">
+          <button type="button" class="df-brand-btn" aria-label="Go to home page" onclick="scrollToTopPage()">
+            <div class="df-brand">
+              <span class="df-brand-main">DELTAFORCE</span>
+              <div class="df-brand-sub">
+                <svg class="df-brand-chevron left" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
+                <svg class="df-brand-chevron left" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
+                <svg class="df-brand-chevron left" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
+
+                <span class="df-brand-subtext">MAPS</span>
+
+                <svg class="df-brand-chevron right" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
+                <svg class="df-brand-chevron right" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
+                <svg class="df-brand-chevron right" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 64L448 256v160L256 224 64 416V256L256 64z"></path></svg>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <nav class="df-header-center" aria-label="Main Navigation">
+          <button class="df-nav-btn" type="button" onclick="scrollToTopPage()">Home</button>
+
+          <div class="df-nav-select-wrap">
+            <select id="mapSelect" class="df-nav-select" aria-label="Select Map">
+              <option value="" selected disabled hidden>Select Map</option>
+              <option value="zero-dam">Zero Dam</option>
+              <option value="layali-grove">Layali Grove</option>
+              <option value="space-city">Space City</option>
+              <option value="brakkesh">Brakkesh</option>
+              <option value="tide-prison">Tide Prison</option>
+            </select>
+
+            <svg class="df-nav-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </div>
+
+          <button class="df-nav-btn" type="button" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">About</button>
+
+          <button class="df-nav-btn icon" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Feedback
+          </button>
+
+          <button class="df-nav-btn icon support" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
+            </svg>
+            Support Us
+          </button>
+        </nav>
+
+        <div class="df-header-spacer"></div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-kicker">Tactical Reference Hub</div>
+        <h1 class="hero-title">Master the <span class="accent">Battlefield</span> One Map at a Time</h1>
+        <p class="hero-desc">
+          Explore official battlegrounds, break down tactical identities, and build cleaner map awareness for competitive play.
+          This custom Delta Force maps hub is styled to match your own neon sci-fi theme while keeping the navigation clean and tournament-friendly.
+        </p>
+        <div class="hero-actions">
+          <button class="cta" onclick="document.getElementById('maps').scrollIntoView({behavior:'smooth'})">Explore Maps</button>
+          <button class="cta ghost" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">Learn More</button>
+        </div>
+      </div>
+
+      <aside class="hero-side">
+        <div class="side-card">
+          <div class="side-label">Featured</div>
+          <div class="side-title">Tournament-Ready Layout</div>
+          <div class="side-text">Designed for esports-style presentation with clean navigation, map selection, and enough room to expand into analysis, callouts, rotations, or POI breakdowns later.</div>
+        </div>
+
+        <div class="side-card">
+          <div class="side-label">Flexible Build</div>
+          <div class="side-title">Ready for Expansion</div>
+          <div class="side-text">You can turn each map into its own page, add overlays, image hotspots, callout layers, or even integrate stat panels and team strategy notes.</div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="maps" class="maps-section">
+      <div class="section-panel">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Map Directory</div>
+            <div class="section-sub">Select a battleground and drill into its tactical identity.</div>
+          </div>
+        </div>
+
+        <div class="map-grid">
+          <article class="map-card" id="zero-dam" onclick="openMap('Zero Dam')">
+            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=80');"></div>
+            <div class="map-copy">
+              <div class="map-name">Zero Dam</div>
+              <span class="map-tag">Hydro Complex</span>
+            </div>
+          </article>
+
+          <article class="map-card" id="layali-grove" onclick="openMap('Layali Grove')">
+            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80');"></div>
+            <div class="map-copy">
+              <div class="map-name">Layali Grove</div>
+              <span class="map-tag">Green Zone</span>
+            </div>
+          </article>
+
+          <article class="map-card" id="space-city" onclick="openMap('Space City')">
+            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80');"></div>
+            <div class="map-copy">
+              <div class="map-name">Space City</div>
+              <span class="map-tag">Urban Sector</span>
+            </div>
+          </article>
+
+          <article class="map-card" id="brakkesh" onclick="openMap('Brakkesh')">
+            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80');"></div>
+            <div class="map-copy">
+              <div class="map-name">Brakkesh</div>
+              <span class="map-tag">Desert Front</span>
+            </div>
+          </article>
+
+          <article class="map-card" id="tide-prison" onclick="openMap('Tide Prison')">
+            <div class="map-art" style="background-image:url('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1200&q=80');"></div>
+            <div class="map-copy">
+              <div class="map-name">Tide Prison</div>
+              <span class="map-tag">Coastal Lockdown</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="section-panel">
+        <div class="section-head">
+          <div>
+            <div class="section-title">About This Hub</div>
+            <div class="section-sub">Built to support map learning, production workflows, and competitive storytelling.</div>
+          </div>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-card">
+            <h3>For Broadcast</h3>
+            <p>This layout works well for analyst desks, caster prep, and tournament support pages. It keeps your presentation polished while leaving space for data or tactical inserts.</p>
+          </div>
+
+          <div class="about-card">
+            <h3>For Players</h3>
+            <p>Use this as a map study page for route planning, POI callouts, common angles, and objective flow. It can easily grow into a full team prep tool.</p>
+          </div>
+
+          <div class="about-card">
+            <h3>For Expansion</h3>
+            <p>Each card can link to its own detailed page, interactive map, or strategy layer. You can also connect this to Supabase or JSON later for dynamic content loading.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Delta Force Maps Hub — Custom themed landing page
+    </footer>
+  </div>
+
+  <script>
+    function scrollToTopPage() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openMap(mapName) {
+      alert(`Open map page for: ${mapName}`);
+    }
+
+    document.getElementById('mapSelect').addEventListener('change', function() {
+      const value = this.value;
+      if (!value) return;
+
+      const target = document.getElementById(value);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,12 +1,31 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Delta Force — Maps</title>
-<style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
 *{box-sizing:border-box}body{margin:0;background:#040c10;color:#ecfff9;font:15px system-ui,sans-serif}a{color:#64f4cf}button,input,select{font:inherit;color:inherit;background:#0a1c23;border:1px solid #31515b;border-radius:9px;padding:10px;min-height:42px}button{cursor:pointer}button:hover,button.active{border-color:#5cf8cf;background:#133c3d}button:disabled{opacity:.4;cursor:default}label{display:grid;gap:6px;color:#afcac8;font-size:13px}header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;border-bottom:1px solid #244047}h1{font-size:24px;margin:0;color:#66ffcf}h2{font-size:17px;margin:0 0 12px}p{line-height:1.5}.top{display:flex;gap:12px;flex-wrap:wrap;padding:14px 24px}.top label{min-width:150px;flex:1}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:14px;padding:0 24px 20px}.panel{border:1px solid #244047;border-radius:14px;padding:16px;background:#08151b}aside{max-height:calc(100dvh - 180px);overflow:auto}.tools{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.help{color:#a3bdbf;font-size:13px}.team{display:grid;grid-template-columns:30px minmax(0,1fr) 32px;gap:7px;align-items:center;margin:8px 0;padding:8px;border:1px solid #29454f;border-radius:10px}.team.selected{border-color:#62ffd3}.team button{padding:3px;min-height:32px}.team input[type=color]{width:30px;height:34px;padding:0;border:0}.team input[type=text]{width:100%;min-width:0;padding:6px;min-height:34px}.team small{grid-column:2/4;color:#a3bdbf}.legend{display:flex;gap:15px;flex-wrap:wrap;padding:10px 0;font-size:13px}.key{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px}.board{position:relative;height:calc(100dvh - 290px);min-height:420px;overflow:hidden;background:#02090c;border:1px solid #28444e;border-radius:10px;touch-action:none;cursor:crosshair}.stage{position:absolute;transform-origin:0 0;width:1000px;height:1000px;background:repeating-linear-gradient(0deg,transparent 0 99px,#19313a 100px),repeating-linear-gradient(90deg,#09181d 0 99px,#19313a 100px)}.stage img,.stage svg{position:absolute;inset:0;width:100%;height:100%;user-select:none;pointer-events:none}.blank{position:absolute;inset:30%;text-align:center;color:#a5c7c7;pointer-events:none}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.toolbar span{margin-right:auto;color:#a4bfc2}.status{min-height:24px;color:#8ef2cf;font-size:13px}input[type=file]{width:100%;font-size:12px}textarea{width:100%;height:74px;background:#061017;color:#ebfffa;border:1px solid #34515b;border-radius:8px;padding:8px;font:inherit}details{margin-top:14px}summary{cursor:pointer;color:#a9cacc}.nav{display:flex;gap:14px;flex-wrap:wrap}.upload{margin-top:15px;display:grid;gap:10px}@media(max-width:850px){header{padding:14px;align-items:flex-start}h1{font-size:20px}.top{padding:12px}.layout{padding:0 12px;grid-template-columns:1fr}.layout>aside{max-height:none}.board{height:60dvh;min-height:360px}.panel{padding:12px}.teams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.team{margin:0}.top label{min-width:120px}.nav{font-size:12px}}
 
 .view-link{display:inline-flex;align-items:center;padding:10px 16px;border:1px solid #31515b;border-radius:9px;text-decoration:none;font-weight:700;color:#64f4cf;background:#0a1c23}
 .nav{align-items:center}.map-view .plotter-only,.map-view #routes,.map-view #legend{display:none!important}.map-view .layout{grid-template-columns:minmax(0,1fr)}.map-view .board{height:calc(100dvh - 280px);cursor:grab}.view-hint{color:#a3bdbf;font-size:13px;margin:10px 0 0}.plotter-view .view-hint{display:none}@media(max-width:850px){.map-view .board{height:65dvh}header{flex-wrap:wrap}}
+
+/* Shared caster workspace navigation and header. */
+body{background:#040c10;font-family:Inter,system-ui,sans-serif}body::before{background:none}
+.workspace-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:4px 0 14px;border-bottom:1px solid #244047}
+.workspace-header .brand{display:flex;align-items:center;gap:12px;min-width:0}
+.workspace-header .brand img{width:54px;flex:none;filter:drop-shadow(0 0 10px #00ffc833)}
+.workspace-header .brand h1{font-family:Orbitron,Inter,system-ui,sans-serif;font-size:26px;line-height:1.1;letter-spacing:3px;color:#64f4cf;margin:0}
+.workspace-header .eyebrow{font-family:Inter,system-ui,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#a3bdbf;margin:0 0 5px}
+.workspace-nav{display:flex;gap:8px;flex-wrap:wrap;width:100%;align-items:center}
+.workspace-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 15px;border:1px solid #31515b;border-radius:10px;background:#0a1c23;color:#b7d6d4;text-decoration:none;font:600 13px Inter,system-ui,sans-serif;white-space:nowrap}
+.workspace-nav a:hover{border-color:#64f4cf;color:#ecfff9}
+.workspace-nav a[aria-current=page]{background:#133c3d;border-color:#64f4cf;color:#64f4cf}
+.workspace-header .status-chip{font-size:12px;border-color:#31515b;background:#0a1c23;color:#b7d6d4;box-shadow:none}
+@media(max-width:760px){.workspace-header{gap:12px}.workspace-header .brand img{width:42px}.workspace-header .brand h1{font-size:21px}.workspace-nav{gap:6px}.workspace-nav a{flex:1 1 auto;padding:9px 11px;font-size:12px}.workspace-header .status-chip{white-space:normal;max-width:100%}}
+
+body>header.workspace-header{margin:18px 24px 0;padding:4px 0 14px}.board{height:calc(100dvh - 360px)}.map-view .board{height:calc(100dvh - 345px)}
+@media(max-width:850px){body>header.workspace-header{margin:14px 12px 0}.board,.map-view .board{height:60dvh}}
 </style></head><body class="map-view">
-<header><div><h1 id="pageTitle">MAP VIEW</h1><span class="help">Delta Force · caster workspace</span></div><nav class="nav"><a id="viewLink" class="view-link" href="#plotter">Rotation plotter</a><a href="index.html">Home</a><a href="operator.html#team-builder">Team builder</a><a href="map-reference.html">Marker reference</a></nav></header>
+<header class="workspace-header"><div class="brand"><img src="https://i.imgur.com/LtMzKj2.png" alt="Delta Force Logo"><div><div class="eyebrow" id="pageTitle">Map viewer</div><h1>DELTA FORCE</h1></div></div><nav class="workspace-nav" aria-label="Caster pages">
+<a href="index.html">Home</a><a data-page="operators" href="operator.html#operators">Operators</a><a data-page="builder" href="operator.html#team-builder">Team builder</a><a data-page="maps" href="map.html#map-view">Map viewer</a><a data-page="plotter" href="map.html#plotter">Rotation plotter</a>
+</nav></header>
 <section class="top"><label>Game mode<select id="mode"><option value="operations">Operations</option><option value="warfare">Warfare</option><option value="detonation">Detonation</option></select></label><label>Map<select id="map"></select></label><label class="plotter-only">Add screenshot map<input id="newMapName" maxlength="50" placeholder="Map name"><button id="addMap">+ Add map</button></label><label class="plotter-only">Map / session name<input id="sessionName" maxlength="80" placeholder="e.g. Finals · Game 1"></label></section>
 <main class="layout"><aside class="panel plotter-only"><h2>Teams & routes</h2><div id="teams" class="teams"></div><button id="addTeam" style="width:100%;margin-top:10px">+ Add team</button>
 <div class="tools" aria-label="Drawing tools"><button data-tool="waypoint" class="active">Waypoints</button><button data-tool="trace">Trace</button><button data-tool="pan">Pan</button></div><p class="help" id="instructions">Tap the map to add numbered waypoints for the selected team.</p>
@@ -72,10 +91,12 @@ function setMapView(){
  const plotting=location.hash==='#plotter';
  document.body.classList.toggle('map-view',!plotting);
  document.body.classList.toggle('plotter-view',plotting);
- $('pageTitle').textContent=plotting?'ROTATION PLOTTER':'MAP VIEW';
+ $('pageTitle').textContent=plotting?'Rotation plotter':'Map viewer';
  document.title=plotting?'Delta Force — Rotation Plotter':'Delta Force — Maps';
- $('viewLink').textContent=plotting?'Map view':'Rotation plotter';
- $('viewLink').href=plotting?'#map-view':'#plotter';
+ document.querySelectorAll('.workspace-nav [data-page]').forEach(link=>{
+  if(link.dataset.page===(plotting?'plotter':'maps'))link.setAttribute('aria-current','page');
+  else link.removeAttribute('aria-current');
+ });
  tool=plotting?'waypoint':'pan';
  document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool));
  $('board').style.cursor=plotting?'crosshair':'grab';

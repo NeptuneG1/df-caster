@@ -809,7 +809,22 @@
         grid-template-rows:minmax(170px, 30dvh) minmax(0,1fr);
       }
     }
-  </style>
+  
+/* Shared caster workspace navigation and header. */
+body{background:#040c10;font-family:Inter,system-ui,sans-serif}body::before{background:none}
+.workspace-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:4px 0 14px;border-bottom:1px solid #244047}
+.workspace-header .brand{display:flex;align-items:center;gap:12px;min-width:0}
+.workspace-header .brand img{width:54px;flex:none;filter:drop-shadow(0 0 10px #00ffc833)}
+.workspace-header .brand h1{font-family:Orbitron,Inter,system-ui,sans-serif;font-size:26px;line-height:1.1;letter-spacing:3px;color:#64f4cf;margin:0}
+.workspace-header .eyebrow{font-family:Inter,system-ui,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#a3bdbf;margin:0 0 5px}
+.workspace-nav{display:flex;gap:8px;flex-wrap:wrap;width:100%;align-items:center}
+.workspace-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 15px;border:1px solid #31515b;border-radius:10px;background:#0a1c23;color:#b7d6d4;text-decoration:none;font:600 13px Inter,system-ui,sans-serif;white-space:nowrap}
+.workspace-nav a:hover{border-color:#64f4cf;color:#ecfff9}
+.workspace-nav a[aria-current=page]{background:#133c3d;border-color:#64f4cf;color:#64f4cf}
+.workspace-header .status-chip{font-size:12px;border-color:#31515b;background:#0a1c23;color:#b7d6d4;box-shadow:none}
+@media(max-width:760px){.workspace-header{gap:12px}.workspace-header .brand img{width:42px}.workspace-header .brand h1{font-size:21px}.workspace-nav{gap:6px}.workspace-nav a{flex:1 1 auto;padding:9px 11px;font-size:12px}.workspace-header .status-chip{white-space:normal;max-width:100%}}
+
+</style>
 </head>
 <body>
   <div id="preloader">
@@ -818,11 +833,11 @@
   </div>
 
   <main class="shell">
-    <header class="topbar">
+    <header class="topbar workspace-header">
       <div class="brand">
         <img src="https://i.imgur.com/LtMzKj2.png" alt="Delta Force Logo">
         <div class="brand-copy">
-          <div class="eyebrow">Tactical Reference</div>
+          <div id="workspacePage" class="eyebrow">Operators</div>
           <h1>DELTA FORCE</h1>
         </div>
       </div>
@@ -831,7 +846,9 @@
         <span class="status-dot"></span>
         <span id="dbStatus">Connecting to operator database...</span>
       </div>
-      <a id="viewLink" class="ghost-btn view-link" href="#team-builder">Team builder</a>
+      <nav class="workspace-nav" aria-label="Caster pages">
+<a href="index.html">Home</a><a data-page="operators" href="operator.html#operators">Operators</a><a data-page="builder" href="operator.html#team-builder">Team builder</a><a data-page="maps" href="map.html#map-view">Map viewer</a><a data-page="plotter" href="map.html#plotter">Rotation plotter</a>
+</nav>
     </header>
 
     <section id="operatorControls" class="controls">
@@ -1273,9 +1290,12 @@
       document.getElementById('operatorControls').hidden = active;
       document.getElementById('operatorLayout').hidden = active;
       document.getElementById('teamBuilder').hidden = !active;
-      const link = document.getElementById('viewLink');
-      link.textContent = active ? 'Operators' : 'Team builder';
-      link.href = active ? '#operators' : '#team-builder';
+      document.getElementById('workspacePage').textContent = active ? 'Team builder' : 'Operators';
+      document.title = active ? 'Delta Force — Team builder' : 'Delta Force — Operators';
+      document.querySelectorAll('.workspace-nav [data-page]').forEach(link => {
+        if(link.dataset.page === (active ? 'builder' : 'operators')) link.setAttribute('aria-current','page');
+        else link.removeAttribute('aria-current');
+      });
     }
 
     function populateTeamBuilder() {

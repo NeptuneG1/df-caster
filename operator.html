@@ -170,7 +170,9 @@
       color:var(--brand-soft);
       box-shadow:var(--shadow);
       font-size:.84rem;
-      white-space:nowrap;
+      white-space:normal;
+      max-width:45%;
+      line-height:1.3;
     }
 
     .status-dot{
@@ -584,6 +586,8 @@
       margin-bottom:7px;
     }
 
+    .info-block a{display:inline-block;margin-top:8px;color:var(--brand-soft);font-size:.8rem;}
+
     .ability-desc{
       color:#f2f2f2;
       font-size:.98rem;
@@ -718,7 +722,9 @@
       }
 
       .desc,
-      .ability-desc{
+      .info-block a{display:inline-block;margin-top:8px;color:var(--brand-soft);font-size:.8rem;}
+
+    .ability-desc{
         font-size:.92rem;
       }
 
@@ -827,6 +833,314 @@
     const TABLE_NAME = 'operator';
     const REST_URL = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?select=*`;
 
+    const OPERATOR_REFERENCE = [
+  {
+    "operator": "D-wolf",
+    "name": "Kai Silva",
+    "role": "Assault",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "Motorized Exoskeleton",
+    "tactical_gear_desc": "Boosts movement and firing speed.",
+    "gadget_1": "Triple Blaster",
+    "gadget_1_desc": "Three explosive shots.",
+    "gadget_2": "Smoke Grenade",
+    "gadget_2_desc": "Temporary visual cover.",
+    "trait": "Tactical Slide",
+    "trait_desc": "Enables sliding.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Gear 5 points, 25s; smoke cooldown 45s.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Shepherd",
+    "name": "Terry Musa",
+    "role": "Engineer",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "Sonic Paralysis",
+    "tactical_gear_desc": "Sonic disruption drone.",
+    "gadget_1": "Sonic Trap",
+    "gadget_1_desc": "Proximity sonic trap.",
+    "gadget_2": "Frag Grenade",
+    "gadget_2_desc": "Fragmentation blast.",
+    "trait": "Buffer Defense",
+    "trait_desc": "Reduces explosive shock.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Frag minimum damage 5; warning 20m.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Luna",
+    "name": "Luna Kim",
+    "role": "Recon",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "Recon Arrow",
+    "tactical_gear_desc": "Scans exposed opponents.",
+    "gadget_1": "Volt Arrow",
+    "gadget_1_desc": "Electrical area damage.",
+    "gadget_2": "Frag Grenade",
+    "gadget_2_desc": "Fragmentation blast.",
+    "trait": "Hunter's Mark",
+    "trait_desc": "Marks damaged opponents.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Frag minimum damage 5; warning 20m.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Stinger",
+    "name": "Roy Smee",
+    "role": "Support",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "Therapeutic Pistol",
+    "tactical_gear_desc": "Heals allies or self.",
+    "gadget_1": "Smokescreen",
+    "gadget_1_desc": "Steerable smoke drone.",
+    "gadget_2": "Hive-Tech Smoke Grenade",
+    "gadget_2_desc": "Smoke supports pistol healing.",
+    "trait": "Quick Rescue",
+    "trait_desc": "Improves squadmate recovery.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Smoke price 300; self/healing-smoke duration 15s.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Vyron",
+    "name": "Wang Yuhao",
+    "role": "Assault",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "Air Shell Launcher - Thumper",
+    "tactical_gear_desc": "Airburst knockdown.",
+    "gadget_1": "Dynamic Propulsion",
+    "gadget_1_desc": "Directional dash.",
+    "gadget_2": "E-Bomb",
+    "gadget_2_desc": "Sticky explosive.",
+    "trait": "Dynamic Auxiliary System",
+    "trait_desc": "Softens falls, boosts movement.",
+    "reference_date": "21 Nov 2026"
+  },
+  {
+    "operator": "Hackclaw",
+    "name": "Mai Xiaowen",
+    "role": "Recon",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "Signal Decoder",
+    "tactical_gear_desc": "Tracks electronic signals.",
+    "gadget_1": "Data Knife",
+    "gadget_1_desc": "Disables nearby electronics.",
+    "gadget_2": "Flash Drone",
+    "gadget_2_desc": "Directional blinding drone.",
+    "trait": "Silent Step",
+    "trait_desc": "Quieter movement.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Flash delay +0.05s; range 40m.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Uluru",
+    "name": "David Fletcher",
+    "role": "Engineer",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "Loitering Munition",
+    "tactical_gear_desc": "Guided cluster projectile.",
+    "gadget_1": "Quickset Cover",
+    "gadget_1_desc": "Creates concrete cover.",
+    "gadget_2": "Composite Incendiary",
+    "gadget_2_desc": "Burns impact area.",
+    "trait": "Battle Hardened",
+    "trait_desc": "Resists slowing effects.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Full blast 2m; main damage 80, armor reduction 80%; submunition 60; incendiary price 250.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Sineva",
+    "name": "Alexei Petrov",
+    "role": "Engineer",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "EOD Set",
+    "tactical_gear_desc": "Heavy protective shield.",
+    "gadget_1": "Grapple Gun",
+    "gadget_1_desc": "Retrieves targets by hook.",
+    "gadget_2": "Razor Wire Grenade",
+    "gadget_2_desc": "Damaging wire obstacle.",
+    "trait": "Rear Protection",
+    "trait_desc": "Stowed shield protects rear.",
+    "reference_date": "21 Nov 2026"
+  },
+  {
+    "operator": "Toxik",
+    "name": "Zoya Pomchenkova",
+    "role": "Support",
+    "source_url": "https://deltaforce.garena.com/en/?redirect=0",
+    "tactical_gear": "\"Dragonfly\" Swarm System",
+    "tactical_gear_desc": "Buffs allies, disrupts enemies.",
+    "gadget_1": "Adreno-Boost",
+    "gadget_1_desc": "Improves ally weapon handling.",
+    "gadget_2": "Blinding Gas",
+    "gadget_2_desc": "Blinds affected enemies.",
+    "trait": "Swift Healing",
+    "trait_desc": "Speeds allied recovery.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Gas stock 3; cooldown 75s.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Nox",
+    "name": "Hélie de Montbel",
+    "role": "Assault",
+    "source_url": "https://deltaforce.garena.com/en/news/all/M3DB35",
+    "tactical_gear": "Silent Assault",
+    "tactical_gear_desc": "Suppresses his sound and increases movement speed. Recon interference differs by mode.",
+    "gadget_1": "Whirlwind Disc",
+    "gadget_1_desc": "Tracking drone damages, wounds and slows its target.",
+    "gadget_2": "Tactical Flashbang",
+    "gadget_2_desc": "Thrown flashbang blinds nearby enemies.",
+    "trait": "Deep Trauma / Revenant",
+    "trait_desc": "Operations delays enemy healing and revival. Warfare delays enemy health regeneration; its trait is now named Revenant.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Operations · Assault 25s solo-Nox, 15s multi-Nox, 25s last survivor. Detonation · Flash fuse −0.05s, repeat immunity removed; no last-survivor extension.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Tempest",
+    "name": "Claire",
+    "role": "Assault",
+    "source_url": "https://deltaforce.garena.com/en/news/all/V6J38U",
+    "tactical_gear": "Drill Charge",
+    "tactical_gear_desc": "Breaches surfaces and disarms enemies through cover with an electrical discharge.",
+    "gadget_1": "Combat Roll",
+    "gadget_1_desc": "Directional evasion roll; knockdowns reduce its cooldown.",
+    "gadget_2": "Emergency Evasion Device",
+    "gadget_2_desc": "Creates an anchor that recalls her on reactivation or fatal damage. Operations also allows one self-revival while downed.",
+    "trait": "Auxiliary Surge Spine",
+    "trait_desc": "Incoming fire or nearby blasts trigger a sprint boost; also improves swimming.",
+    "reference_date": "21 Nov 2026"
+  },
+  {
+    "operator": "Gizmo",
+    "name": "Rashid Rahal",
+    "role": "Engineer",
+    "source_url": "https://deltaforce.garena.com/en/news/all/VPYSUD",
+    "tactical_gear": "Crawler Nest",
+    "tactical_gear_desc": "Deploys three enemy-seeking crawlers. Their explosions apply corrosion, increasing incoming bullet damage.",
+    "gadget_1": "Smoke Mine",
+    "gadget_1_desc": "Proximity smoke slows movement and reveals corroded enemies.",
+    "gadget_2": "T.I.M (Tenacious Interception Module)",
+    "gadget_2_desc": "Patrol robot pursues enemies and restrains movement, aiming and gadget use.",
+    "trait": "Firewall",
+    "trait_desc": "Proximity to his deployables improves weapon handling.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Smoke 18s.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Vlinder",
+    "name": "Lina Van Der Meer",
+    "role": "Support",
+    "source_url": "https://deltaforce.garena.com/en/news/all/MW4ZYF",
+    "tactical_gear": "Flutter Rescue UAVs",
+    "tactical_gear_desc": "Sends rescue drones to downed allies. Operations requires approaching after injection; Warfare can revive remotely.",
+    "gadget_1": "Med Drones",
+    "gadget_1_desc": "Following drones heal allies.",
+    "gadget_2": "Windmill Smoke Grenade",
+    "gadget_2_desc": "Smoke grenade with a steerable flight path.",
+    "trait": "Bio Scan",
+    "trait_desc": "Operations extends allied downed timers and reveals ally health when using Med Drones. Warfare rescues reduce rescue-UAV cooldown.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Rescue 7 points; revived HP 50.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Raptor",
+    "name": "Landon Harrison",
+    "role": "Recon",
+    "source_url": "https://deltaforce.garena.com/en/news/all/W9PGYU",
+    "tactical_gear": "Wing Cam",
+    "tactical_gear_desc": "Attaches a camera to an opponent to reveal positions periodically. Operations can also target tracks. Destroying it can expose Raptor.",
+    "gadget_1": "Silver Wing",
+    "gadget_1_desc": "Piloted reconnaissance drone marks enemies, carries EMP grenades and deploys Wing Cams.",
+    "gadget_2": "EMP Grenade",
+    "gadget_2_desc": "Disables enemy electronic devices.",
+    "trait": "Trace Tracker",
+    "trait_desc": "Operations investigates footprints and opened containers. Warfare warns when enemies aim at him and enables a rapid Wing Cam response.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Wing Cam 4 points; mobile drone 8m/s.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Morse",
+    "name": "Luke Everley",
+    "role": "Recon",
+    "source_url": "https://deltaforce.garena.com/en/news/all/YVRATP",
+    "image_url": "https://web.df.garena.com/03_news/news_banner/SMP/20260420_patchnotes/image.png",
+    "tactical_gear": "Advanced Sonar Device",
+    "tactical_gear_desc": "Periodic scans count enemies and locate those making sound.",
+    "gadget_1": "Throwable Jammer",
+    "gadget_1_desc": "Disruptor slows enemies and interferes with vision, hearing and turning.",
+    "gadget_2": "Delayed Flashbang",
+    "gadget_2_desc": "Timed flash blinds enemies facing the blast.",
+    "trait": "Sonic Sense / Sonic Sitrep",
+    "trait_desc": "Operations improves hearing and roughly marks nearby gunfire. Warfare locates nearby enemy devices for Morse.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · Detonation · Jammer 10m; flash fuse −0.05s, repeat immunity removed.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "N-Two",
+    "name": "Gabriel Mercier",
+    "role": "Engineer",
+    "source_url": "https://deltaforce.garena.com/en/news/all/2MX7J4",
+    "image_url": "https://web.df.garena.com/03_news/news_banner/SMP/20260626_update/image.jfif",
+    "tactical_gear": "Frost Launcher",
+    "tactical_gear_desc": "Fires up to six cryogenic grenades; sustained fire increases firing rate.",
+    "gadget_1": "Cryo-Flask",
+    "gadget_1_desc": "Creates a cold zone that affects enemies and can freeze closed doors.",
+    "gadget_2": "Homing Stun Grenade",
+    "gadget_2_desc": "Tracking grenade damages enemies and disrupts vision.",
+    "trait": "Frostbite / Permafrost",
+    "trait_desc": "Cold progressively slows and freezes enemies. Operations weakens fracture resistance; Warfare impairs vehicle handling.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · All modes · Flask 7s. Operations · Flask 7 HP/0.5s, cooldown 45s; stun 40s. Warfare · Flask 10 HP/0.5s.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Rover",
+    "name": "Rowan Walsh",
+    "role": "Support",
+    "source_url": "https://deltaforce.garena.com/en/news/all/PA6CZD",
+    "image_url": "https://web.df.garena.com/03_news/news_banner/SMP/20260905_update/image1.jpg",
+    "tactical_gear": "Man’s Best Friend",
+    "tactical_gear_desc": "Calls Clover to detect, pursue, tackle and mark enemies.",
+    "gadget_1": "Dart Rifle",
+    "gadget_1_desc": "Mist damages enemies and lowers maximum HP. Operations also heals allied limb injuries.",
+    "gadget_2": "Irritant",
+    "gadget_2_desc": "Smoke makes enemies cough.",
+    "trait": "Guard Drive / Prey Drive",
+    "trait_desc": "Gadget hits assist Clover tracking. Guard Drive extends downed time and clears limb injuries on rescue; Prey Drive provides rescue ammo. The English announcement labels both variants Operations; confirm the in-game mode label.",
+    "reference_date": "21 Nov 2026",
+    "balance_notes": "10 Nov · All modes · Clover detects sound and leaps. Operations · Level 6+ ammo deals 2× damage to Clover. Detonation · Gear 6 points; darts remove 45 max HP; smoke 18s.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/GWPGVY"
+  },
+  {
+    "operator": "Martelo",
+    "name": "Veronica Cardozo",
+    "role": "Assault",
+    "source_url": "https://deltaforce.garena.com/en/news/all/GWPGVY",
+    "image_url": "https://web.df.garena.com/03_news/news_banner/SMP/20261108_patchnotes/image1.png",
+    "release": "10 Nov 2026 · Aurora",
+    "balance_notes": "12 Nov · Smoke Halo sound attenuation reaches 50m, with stronger attenuation beyond 30m. Its camera-turn mechanical sound is audible only to Martelo.",
+    "balance_source": "https://deltaforce.garena.com/en/news/all/XZSNPX",
+    "tactical_gear": "Ariete",
+    "tactical_gear_desc": "Charges with frontal damage reduction. Impact or an early leap triggers an area knockdown.",
+    "gadget_1": "Smoke Halo",
+    "gadget_1_desc": "Shoulder launcher creates surrounding smoke or an aimed smokescreen.",
+    "gadget_2": "High-Explosive Grenade",
+    "gadget_2_desc": "Thrown explosive detonates after a short fuse.",
+    "trait": "Guerreira",
+    "trait_desc": "Knockdowns or low HP briefly boost movement and reload speed.",
+    "reference_date": "21 Nov 2026"
+  }
+];
+
     const OPERATOR_IMAGE_BASES = [
       './assets/img/operators',
       'assets/img/operators',
@@ -859,7 +1173,11 @@
       'tempest',
       'vlinder',
       'gizmo',
-      'raptor'
+      'raptor',
+      'morse',
+      'n-two',
+      'rover',
+      'martelo'
     ];
 
     const KNOWN_ROLE_SLUGS = [
@@ -1008,7 +1326,7 @@
 
     function operatorImageCandidates(op) {
       if (!op.imageKey) return [];
-      return OPERATOR_IMAGE_BASES.map(base => `${base}/${op.imageKey}.png`);
+      return [...OPERATOR_IMAGE_BASES.map(base => `${base}/${op.imageKey}.png`), op.imageUrl].filter(Boolean);
     }
 
     function operatorBgImageCandidates(op) {
@@ -1226,6 +1544,12 @@
         faction,
         origin,
         imageKey,
+        imageUrl: safeText(flat.image_url),
+        sourceUrl: safeText(flat.source_url),
+        referenceDate: safeText(flat.reference_date),
+        balanceNotes: safeText(flat.balance_notes),
+        balanceSource: safeText(flat.balance_source),
+        release: safeText(flat.release),
         abilities: buildAbilities(flat)
       };
     }
@@ -1340,7 +1664,7 @@
       const bgImageSrc = await resolveOperatorBgImage(op);
       const roleImageSrc = await resolveRoleImage(op.role);
       const roleTitle = op.role || 'Unknown';
-      const chips = [op.role, op.faction, op.origin].filter(Boolean);
+      const chips = [op.role, op.faction, op.origin, op.release].filter(Boolean);
       const theme = getRoleTheme(op.role);
       const roleDesc =
         ROLE_ANALYSIS[theme.slug] ||
@@ -1393,12 +1717,26 @@
             </div>
           </div>
 
+          ${op.balanceNotes ? `
+            <div class="info-block">
+              <div class="ability-title">Latest balance changes</div>
+              <div class="ability-desc">${escapeHtml(op.balanceNotes)}</div>
+              <a href="${escapeHtml(op.balanceSource)}" target="_blank" rel="noopener noreferrer">Official patch notes</a>
+            </div>
+          ` : ''}
+
           ${op.abilities.map(item => `
             <div class="info-block">
               <div class="ability-title">${escapeHtml(item.type)} - ${escapeHtml(item.title)}</div>
               <div class="ability-desc">${escapeHtml(item.desc)}</div>
             </div>
           `).join('')}
+          ${op.sourceUrl ? `
+            <div class="info-block">
+              <div class="ability-desc">Reference checked ${escapeHtml(op.referenceDate)}. Ability summaries cover core mechanics; mode-specific values appear above.</div>
+              <a href="${escapeHtml(op.sourceUrl)}" target="_blank" rel="noopener noreferrer">Official operator reference</a>
+            </div>
+          ` : ''}
         </div>
       `;
     }
@@ -1409,14 +1747,55 @@
       await renderDetail();
     }
 
+    function mergeOperatorReference(rows) {
+      const merged = new Map(rows.map((row, index) => {
+        const op = normalizeOperator(row, index);
+        return [toOperatorSlug(op.codename), op];
+      }));
+
+      for (const row of OPERATOR_REFERENCE) {
+        const reference = normalizeOperator(row);
+        const existing = merged.get(reference.imageKey);
+        // Keep database identity and richer legacy descriptions. Fully sourced
+        // recent additions override stale or incomplete database ability fields.
+        const useReference = ['morse', 'n-two', 'rover', 'martelo'].includes(reference.imageKey);
+        const op = existing ? {
+          ...existing,
+          sourceUrl: reference.sourceUrl,
+          referenceDate: reference.referenceDate,
+          balanceNotes: reference.balanceNotes,
+          balanceSource: reference.balanceSource,
+          imageUrl: reference.imageUrl || existing.imageUrl,
+          release: reference.release,
+          ...(useReference ? {
+            realName: reference.realName,
+            role: reference.role,
+            abilities: reference.abilities
+          } : {})
+        } : reference;
+        if (reference.imageKey === 'nox') {
+          op.abilities = op.abilities.map(ability => ability.type === 'Trait'
+            ? { ...ability, title: 'Deep Trauma / Revenant', desc: reference.abilities.find(item => item.type === 'Trait').desc }
+            : ability);
+        }
+        merged.set(reference.imageKey, op);
+      }
+      return [...merged.values()].sort(operatorSort);
+    }
+
     async function loadOperators() {
-      els.dbStatus.textContent = 'Loading operator database...';
       els.refreshBtn.disabled = true;
-      els.detailRoot.className = 'detail-root detail-empty';
-      els.detailRoot.textContent = 'Loading operator data...';
+      state.operatorImageCache.clear();
+      state.all = mergeOperatorReference([]);
+      state.selectedId = state.all.find(op => op.imageKey === 'martelo')?.id || state.all[0]?.id;
+      populateRoleFilter();
+      await renderAll();
+      els.preloader.classList.add('hidden');
+      els.dbStatus.textContent = '21 Nov 2026 reference · checking database…';
 
       try {
         const response = await fetch(REST_URL, {
+          signal: AbortSignal.timeout(10000),
           headers: {
             apikey: SUPABASE_ANON_KEY,
             Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
@@ -1424,41 +1803,25 @@
             'Accept-Profile': 'public'
           }
         });
+        if (!response.ok) throw new Error(`Database returned ${response.status}`);
+        const rows = await response.json();
+        if (!Array.isArray(rows)) throw new Error('Invalid operator response');
 
-        const text = await response.text();
-        let rows = [];
-
-        try {
-          rows = text ? JSON.parse(text) : [];
-        } catch (err) {
-          throw new Error(`Invalid JSON response: ${text}`);
-        }
-
-        if (!response.ok) {
-          const message = rows?.message || rows?.error || `${response.status} ${response.statusText}`;
-          throw new Error(message);
-        }
-
-        if (!Array.isArray(rows)) {
-          throw new Error('Unexpected response format from Supabase.');
-        }
-
-        state.all = rows.map((row, index) => normalizeOperator(row, index)).sort(operatorSort);
-        state.selectedId = state.all[0]?.id || null;
-
+        const selectedKey = state.all.find(op => op.id === state.selectedId)?.imageKey;
+        const selectedRole = els.roleFilter.value;
+        state.all = mergeOperatorReference(rows);
+        state.selectedId = state.all.find(op => op.imageKey === selectedKey)?.id || state.all[0]?.id;
         populateRoleFilter();
+        if ([...els.roleFilter.options].some(option => option.value === selectedRole)) {
+          els.roleFilter.value = selectedRole;
+        }
         await renderAll();
-
-        els.dbStatus.textContent = `Connected — ${state.all.length} operators loaded`;
+        els.dbStatus.textContent = `Live database + 21 Nov reference · ${state.all.length} operators`;
       } catch (error) {
-        console.error('Operator load error:', error);
-        els.dbStatus.textContent = 'Connection failed';
-        els.operatorList.innerHTML = `<div class="error-state"><strong>Unable to load operators.</strong><br>${escapeHtml(error.message)}</div>`;
-        els.detailRoot.className = 'detail-root detail-empty';
-        els.detailRoot.innerHTML = `<div class="error-state"><strong>Supabase request failed.</strong><br>${escapeHtml(error.message)}</div>`;
+        console.warn('Using saved operator reference:', error.message);
+        els.dbStatus.textContent = '21 Nov 2026 reference · database unavailable';
       } finally {
         els.refreshBtn.disabled = false;
-        setTimeout(() => els.preloader.classList.add('hidden'), 350);
       }
     }
 

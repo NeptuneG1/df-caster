@@ -1326,11 +1326,13 @@
 
     function operatorImageCandidates(op) {
       if (!op.imageKey) return [];
-      return [...OPERATOR_IMAGE_BASES.map(base => `${base}/${op.imageKey}.png`), op.imageUrl].filter(Boolean);
+      if (op.imageUrl) return [op.imageUrl];
+      return OPERATOR_IMAGE_BASES.map(base => `${base}/${op.imageKey}.png`);
     }
 
     function operatorBgImageCandidates(op) {
-      if (!op.imageKey) return [];
+      const availableBackgrounds = ['d-wolf', 'shepherd', 'luna', 'stinger', 'vyron', 'hackclaw', 'uluru', 'sineva', 'toxik'];
+      if (!availableBackgrounds.includes(op.imageKey)) return [];
       return [
         ...OPERATOR_BG_IMAGE_BASES.map(base => `${base}/${op.imageKey}_bg.jpg`),
         ...OPERATOR_BG_IMAGE_BASES.map(base => `${base}/${op.imageKey}_bg.png`),

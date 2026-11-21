@@ -588,6 +588,35 @@
 
     .info-block a{display:inline-block;margin-top:8px;color:var(--brand-soft);font-size:.8rem;}
 
+    [hidden]{display:none !important;}
+    .builder-view{grid-template-rows:auto minmax(0,1fr);}
+    .view-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;}
+    .team-builder{overflow:auto;padding:22px;}
+    .builder-toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:16px;margin-bottom:20px;}
+    .builder-toolbar label{flex:1;min-width:180px;}
+    .builder-label{display:block;color:var(--muted);font-size:.84rem;margin-bottom:7px;}
+    .builder-players{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+    .builder-player{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(0,8,8,.66);min-width:0;}
+    .builder-player .field{margin-bottom:14px;}
+    .builder-preview{display:flex;gap:12px;align-items:center;min-height:110px;margin-top:14px;}
+    .builder-preview img{width:74px;height:86px;object-fit:cover;border-radius:12px;}
+    .builder-preview p{font-size:.88rem;line-height:1.45;color:var(--muted);margin-top:6px;}
+    .comp-summary{margin-top:22px;border-top:1px solid var(--line);padding-top:20px;}
+    .comp-summary h2{font-family:Orbitron,sans-serif;font-size:1.3rem;margin-bottom:12px;}
+    .comp-summary h3{font-size:1rem;color:var(--brand-soft);margin-bottom:9px;}
+    .comp-columns{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0;}
+    .comp-summary p,.comp-summary li{line-height:1.6;}
+    .comp-summary ul{padding-left:20px;}
+    .comp-summary li + li{margin-top:8px;}
+    .caster-line{padding:18px;border-left:3px solid var(--brand);background:rgba(0,255,200,.06);margin:12px 0;white-space:pre-wrap;}
+    .builder-feedback{display:inline-block;margin-left:12px;font-size:.84rem;color:var(--muted);}
+    @media(max-width:760px){
+      .builder-players,.comp-columns{grid-template-columns:1fr;}
+      .team-builder{padding:16px;}
+      .topbar{flex-wrap:wrap;}
+      .view-link{min-height:40px;}
+    }
+
     .ability-desc{
       color:#f2f2f2;
       font-size:.98rem;
@@ -802,9 +831,10 @@
         <span class="status-dot"></span>
         <span id="dbStatus">Connecting to operator database...</span>
       </div>
+      <a id="viewLink" class="ghost-btn view-link" href="#team-builder">Team builder</a>
     </header>
 
-    <section class="controls">
+    <section id="operatorControls" class="controls">
       <input id="searchInput" class="field" type="text" placeholder="Search codename, real name, or role..." />
       <select id="roleFilter" class="select">
         <option value="all">All roles</option>
@@ -812,7 +842,7 @@
       <button id="refreshBtn" class="ghost-btn" type="button">Refresh Data</button>
     </section>
 
-    <section class="layout">
+    <section id="operatorLayout" class="layout">
       <aside class="panel list-panel">
         <div class="results-bar">
           <div id="resultsText">Loading operators...</div>
@@ -824,6 +854,14 @@
       <section class="panel detail-panel">
         <div id="detailRoot" class="detail-root detail-empty">Waiting for operator data...</div>
       </section>
+    </section>
+    <section id="teamBuilder" class="panel team-builder" aria-label="Three-player team builder" hidden>
+      <div class="builder-toolbar">
+        <label><span class="builder-label">Team name</span><input id="compTeamName" class="field" maxlength="80" placeholder="Team name (optional)"></label>
+        <label><span class="builder-label">Game mode</span><select id="compMode" class="select"><option value="operations">Operations</option><option value="warfare">Warfare</option><option value="detonation">Detonation</option></select></label>
+      </div>
+      <div class="builder-players" id="builderPlayers"></div>
+      <div id="compSummary" class="comp-summary" aria-live="polite"></div>
     </section>
   </main>
 
@@ -1195,6 +1233,161 @@
     };
 
     const PLACEHOLDER_TEXT = 'Description placeholder — to be added later.';
+
+    // Editorial casting reads based on each operator's core kit. These tags
+    // describe utility coverage, rather than predicting results or win rates.
+    const COMP_PROFILES = {
+      'd-wolf': {tags:['entry','mobility','smoke'], job:'sets the entry tempo with Exoskeleton mobility and smoke'},
+      vyron: {tags:['entry','mobility','control'], job:'creates an opening through knockdowns and directional movement'},
+      tempest: {tags:['entry','mobility','control'], job:'threatens cover with Drill Charge and keeps an evasive route available'},
+      nox: {tags:['entry','mobility','control'], job:'pressures a flank with Silent Assault and disruptive throwables'},
+      martelo: {tags:['entry','smoke','control'], job:'breaches with Ariete and screens the approach with Smoke Halo'},
+      shepherd: {tags:['denial','control'], job:'slows an approach with sonic utility and traps'},
+      uluru: {tags:['denial','cover'], job:'creates cover and pressures a held position with explosives'},
+      sineva: {tags:['cover','control','rescue'], job:'absorbs frontal pressure with the shield and retrieves targets with the grapple'},
+      gizmo: {tags:['denial','control','smoke'], job:'controls a lane with deployables and corrosion pressure'},
+      'n-two': {tags:['denial','control'], job:'restricts movement with cryogenic zones and stun utility'},
+      luna: {tags:['info','denial'], job:'scouts exposed opponents with Recon Arrow and pressures space with Volt Arrow'},
+      hackclaw: {tags:['info','control'], job:'tracks electronic signals and disrupts an opponent before the follow-up'},
+      raptor: {tags:['info','control'], job:'builds information with cameras and drone reconnaissance'},
+      morse: {tags:['info','control'], job:'uses sound-based reconnaissance to set up jammer and flash pressure'},
+      stinger: {tags:['healing','rescue','smoke'], job:'supports recovery with healing tools and smoke'},
+      toxik: {tags:['buff','control'], job:'improves allied weapon handling while disrupting opponents'},
+      vlinder: {tags:['healing','rescue','smoke'], job:'keeps recovery tools available through medical and rescue drones'},
+      rover: {tags:['info','healing','control'], job:'applies Clover pressure and uses Dart Rifle mist to disrupt enemies'}
+    };
+
+    const comp = {teamName:'', mode:'operations', players:Array.from({length:3}, () => ({name:'', operator:''}))};
+    try {
+      const saved = JSON.parse(localStorage.getItem('df-caster-team') || 'null');
+      if (saved && Array.isArray(saved.players) && saved.players.length === 3) {
+        comp.teamName = safeText(saved.teamName).slice(0,80);
+        comp.mode = ['operations','warfare','detonation'].includes(saved.mode) ? saved.mode : 'operations';
+        comp.players = saved.players.map(player => ({name:safeText(player?.name).slice(0,60), operator:toOperatorSlug(player?.operator)}));
+      }
+    } catch (error) { console.warn('Saved team could not be read:', error.message); }
+
+    function setBuilderView() {
+      const active = location.hash === '#team-builder';
+      document.querySelector('.shell').classList.toggle('builder-view', active);
+      document.getElementById('operatorControls').hidden = active;
+      document.getElementById('operatorLayout').hidden = active;
+      document.getElementById('teamBuilder').hidden = !active;
+      const link = document.getElementById('viewLink');
+      link.textContent = active ? 'Operators' : 'Team builder';
+      link.href = active ? '#operators' : '#team-builder';
+    }
+
+    function populateTeamBuilder() {
+      document.getElementById('compTeamName').value = comp.teamName;
+      document.getElementById('compMode').value = comp.mode;
+      document.getElementById('builderPlayers').innerHTML = comp.players.map((player,index) => `
+        <div class="builder-player">
+          <label><span class="builder-label">Player ${index+1}</span><input class="field" id="compPlayer${index}" data-player="${index}" maxlength="60" placeholder="Player name (optional)" value="${escapeHtml(player.name)}"></label>
+          <label><span class="builder-label">Operator</span><select id="compOperator${index}" class="select" data-operator="${index}">
+            <option value="">Select an operator</option>
+            ${state.all.map(op => `<option value="${escapeHtml(op.imageKey)}" ${player.operator === op.imageKey ? 'selected' : ''}>${escapeHtml(op.codename)} · ${escapeHtml(op.role)}</option>`).join('')}
+          </select></label>
+          <div class="builder-preview" id="compPreview${index}"></div>
+        </div>
+      `).join('');
+      renderComposition();
+    }
+
+    function selectedComposition() {
+      return comp.players.map((player,index) => {
+        const op = state.all.find(item => item.imageKey === player.operator);
+        if (!op) return null;
+        const profile = COMP_PROFILES[op.imageKey] || {tags:[], job:`provides ${op.role.toLowerCase()} utility`};
+        // Rover's darts heal limb injuries only in Operations.
+        const tags = profile.tags.filter(tag => !(op.imageKey === 'rover' && tag === 'healing' && comp.mode !== 'operations'));
+        return {op, tags, job:profile.job, player:player.name || `Player ${index+1}`};
+      });
+    }
+
+    function buildCompositionNotes(picks) {
+      const first = tag => picks.find(pick => pick.tags.includes(tag));
+      const name = pick => pick.op.codename;
+      const strengths = [];
+      const watchpoints = [];
+      const info = first('info');
+      const entry = first('entry');
+      const recovery = first('rescue') || first('healing');
+      const smoke = first('smoke');
+      const hold = first('denial') || first('cover');
+      if (info) strengths.push(`${name(info)} gives the trio an information tool to check a route before committing.`);
+      if (entry) strengths.push(`${name(entry)} supplies a way to initiate pressure and contest an opening.`);
+      if (recovery) strengths.push(`${name(recovery)} adds ${recovery.tags.includes('rescue') ? 'rescue' : 'limb-recovery'} utility for a reset after a trade.`);
+      if (hold) strengths.push(`${name(hold)} helps secure space with ${hold.tags.includes('cover') ? 'protective cover' : 'area denial'}.`);
+      if (smoke) strengths.push(`${name(smoke)} can obscure sightlines for movement${recovery ? ' or a recovery attempt' : ''}.`);
+      if (first('buff')) strengths.push('Toxik can improve allied weapon handling during a coordinated engagement.');
+      if (!info) watchpoints.push('Information depends more heavily on sound, sightlines and teammate callouts. Watch the first unscouted corner.');
+      if (!recovery) watchpoints.push('The selected kits offer limited dedicated recovery utility. A failed trade can make the reset costly.');
+      if (!smoke) watchpoints.push('There is no dedicated smoke tool in these picks. Crossings need cover, timing or suppression.');
+      if (!entry) watchpoints.push('The trio leans toward setup and response. Watch who converts its utility into the first forward move.');
+      if (!hold) watchpoints.push('Once space is won, the trio has fewer cover or area-denial tools to protect it.');
+      const repeated = [...new Set(picks.filter((pick,index) => picks.findIndex(other => other.op.imageKey === pick.op.imageKey) !== index).map(pick => pick.op.codename))];
+      if (repeated.length) watchpoints.push(`Repeated ${repeated.join(' / ')} picks concentrate similar tools. Watch utility overlap and the gaps left elsewhere.`);
+      if (!watchpoints.length) watchpoints.push('The kits cover several needs. Watch utility timing and spacing when more than one player is committed to the same fight.');
+      const opener = info || hold || picks[0];
+      const follow = picks.find(pick => pick !== opener && pick.tags.includes('entry')) || picks.find(pick => pick !== opener);
+      const reserve = picks.find(pick => pick !== opener && pick !== follow);
+      const modeReads = {
+        operations:'Preserve a reset route and utility for third-party pressure or extraction.',
+        warfare:'Time the push around the objective and the next reinforcement wave.',
+        detonation:'Time the utility sequence around the execute or retake.'
+      };
+      const plan = `${opener.player} on ${name(opener)} ${opener.job}. ${follow.player} on ${name(follow)} follows with their own utility, while ${reserve.player} on ${name(reserve)} ${reserve.job}. ${modeReads[comp.mode]}`;
+      const identity = info && entry && recovery ? 'information-led pressure with recovery behind it' :
+        picks.filter(pick => pick.tags.includes('entry')).length >= 2 ? 'a tempo-heavy attack' :
+        picks.filter(pick => pick.tags.includes('denial') || pick.tags.includes('cover')).length >= 2 ? 'a controlled hold and counterattack' :
+        picks.filter(pick => pick.tags.includes('rescue') || pick.tags.includes('healing')).length >= 2 ? 'a recovery-focused setup' : 'a utility-led setup';
+      const cast = `${comp.teamName || 'This trio'} brings ${picks.map(name).join(', ')} — ${identity}. ${info && entry ? `Watch ${name(info)} set the read before ${name(entry)} commits.` : `Watch how ${name(opener)} sets the opening for the next player.`} ${watchpoints[0]}`;
+      return {strengths,watchpoints,plan,cast};
+    }
+
+    function renderComposition() {
+      const picks = selectedComposition();
+      picks.forEach((pick,index) => {
+        document.getElementById(`compPreview${index}`).innerHTML = pick ? `
+          <img src="${escapeHtml(operatorImageCandidates(pick.op)[0] || '')}" alt="${escapeHtml(pick.op.codename)}">
+          <div><strong>${escapeHtml(pick.op.role)}</strong><p>${escapeHtml(pick.job)}.</p></div>
+        ` : '<p>Select an operator for this player.</p>';
+      });
+      const target = document.getElementById('compSummary');
+      if (picks.some(pick => !pick)) {
+        target.innerHTML = '<p>Select all three operators to generate casting notes.</p>';
+        return;
+      }
+      const notes = buildCompositionNotes(picks);
+      target.innerHTML = `
+        <h2>${escapeHtml(comp.teamName || 'Three-player composition')}</h2>
+        <p>${escapeHtml(comp.mode.charAt(0).toUpperCase()+comp.mode.slice(1))} · ${picks.map(pick => escapeHtml(pick.op.role)).join(' / ')}</p>
+        <div class="comp-columns">
+          <section><h3>Strengths</h3><ul>${notes.strengths.map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul></section>
+          <section><h3>Watchpoints</h3><ul>${notes.watchpoints.map(line => `<li>${escapeHtml(line)}</li>`).join('')}</ul></section>
+        </div>
+        <h3>How the trio can play</h3><p>${escapeHtml(notes.plan)}</p>
+        <h3 style="margin-top:20px">Ready to cast</h3><p class="caster-line" id="casterLine">${escapeHtml(notes.cast)}</p>
+        <button id="copyComp" class="ghost-btn" type="button">Copy casting notes</button><span class="builder-feedback" id="copyFeedback" role="status"></span>
+        <p style="margin-top:14px;color:var(--muted);font-size:.8rem">Casting reads are editorial, based on the selected kits. Confirm tactical gear availability in the match.</p>
+      `;
+      document.getElementById('copyComp').addEventListener('click', async () => {
+        const text = `${comp.teamName || 'Three-player composition'} (${comp.mode})\n${picks.map(pick => `${pick.player} — ${pick.op.codename}`).join('\n')}\n\nStrengths\n${notes.strengths.join('\n')}\n\nWatchpoints\n${notes.watchpoints.join('\n')}\n\nHow the trio can play\n${notes.plan}\n\nReady to cast\n${notes.cast}`;
+        try {
+          await navigator.clipboard.writeText(text);
+          document.getElementById('copyFeedback').textContent = 'Copied';
+        } catch {
+          document.getElementById('copyFeedback').textContent = 'Select and copy the notes above.';
+        }
+      });
+    }
+
+    function saveComposition() {
+      try { localStorage.setItem('df-caster-team', JSON.stringify(comp)); }
+      catch (error) { console.warn('Team could not be saved:', error.message); }
+      renderComposition();
+    }
 
     const state = {
       all: [],
@@ -1797,8 +1990,9 @@
       state.all = mergeOperatorReference([]);
       state.selectedId = state.all.find(op => op.imageKey === 'martelo')?.id || state.all[0]?.id;
       populateRoleFilter();
-      await renderAll();
+      populateTeamBuilder();
       els.preloader.classList.add('hidden');
+      await renderAll();
       els.dbStatus.textContent = '21 Nov 2026 reference · checking database…';
 
       try {
@@ -1820,6 +2014,7 @@
         state.all = mergeOperatorReference(rows);
         state.selectedId = state.all.find(op => op.imageKey === selectedKey)?.id || state.all[0]?.id;
         populateRoleFilter();
+        populateTeamBuilder();
         if ([...els.roleFilter.options].some(option => option.value === selectedRole)) {
           els.roleFilter.value = selectedRole;
         }
@@ -1836,6 +2031,29 @@
     els.searchInput.addEventListener('input', () => renderAll());
     els.roleFilter.addEventListener('change', () => renderAll());
     els.refreshBtn.addEventListener('click', loadOperators);
+
+    document.getElementById('builderPlayers').addEventListener('input', event => {
+      if (event.target.dataset.player !== undefined) {
+        comp.players[Number(event.target.dataset.player)].name = event.target.value;
+        saveComposition();
+      }
+    });
+    document.getElementById('builderPlayers').addEventListener('change', event => {
+      if (event.target.dataset.operator !== undefined) {
+        comp.players[Number(event.target.dataset.operator)].operator = event.target.value;
+        saveComposition();
+      }
+    });
+    document.getElementById('compTeamName').addEventListener('input', event => {
+      comp.teamName = event.target.value;
+      saveComposition();
+    });
+    document.getElementById('compMode').addEventListener('change', event => {
+      comp.mode = event.target.value;
+      saveComposition();
+    });
+    window.addEventListener('hashchange', setBuilderView);
+    setBuilderView();
 
     window.addEventListener('load', loadOperators);
   </script>

@@ -1613,7 +1613,9 @@
       `;
     }
 
-    async function renderOperatorList() {
+    let renderRevision = 0;
+
+    async function renderOperatorList(revision) {
       if (!state.filtered.length) {
         els.operatorList.innerHTML = `<div class="empty-state">No operators matched your current filters.</div>`;
         return;
@@ -1637,6 +1639,7 @@
         })
       );
 
+      if (revision !== renderRevision) return;
       els.operatorList.innerHTML = cards.join('');
 
       els.operatorList.querySelectorAll('.operator-card').forEach(card => {
@@ -1647,7 +1650,7 @@
       });
     }
 
-    async function renderDetail() {
+    async function renderDetail(revision) {
       const op =
         state.filtered.find(item => item.id === state.selectedId) ||
         state.all.find(item => item.id === state.selectedId) ||
@@ -1665,6 +1668,7 @@
       const imageSrc = await resolveOperatorImage(op);
       const bgImageSrc = await resolveOperatorBgImage(op);
       const roleImageSrc = await resolveRoleImage(op.role);
+      if (revision !== renderRevision) return;
       const roleTitle = op.role || 'Unknown';
       const chips = [op.role, op.faction, op.origin, op.release].filter(Boolean);
       const theme = getRoleTheme(op.role);
@@ -1744,9 +1748,11 @@
     }
 
     async function renderAll() {
+      const revision = ++renderRevision;
       applyFilters();
-      await renderOperatorList();
-      await renderDetail();
+      await renderOperatorList(revision);
+      if (revision !== renderRevision) return;
+      await renderDetail(revision);
     }
 
     function mergeOperatorReference(rows) {

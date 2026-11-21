@@ -22,18 +22,25 @@ body{background:#040c10;font-family:Inter,system-ui,sans-serif}body::before{back
 
 body>header.workspace-header{margin:18px 24px 0;padding:4px 0 14px}.board{height:calc(100dvh - 360px)}.map-view .board{height:calc(100dvh - 345px)}
 @media(max-width:850px){body>header.workspace-header{margin:14px 12px 0}.board,.map-view .board{height:60dvh}}
+
+/* Give the map more room on desktop and tablets. */
+body>header.workspace-header{margin:12px 12px 0}.top{padding:10px 12px;gap:8px}.layout{padding:0 12px 12px;gap:8px;grid-template-columns:244px minmax(0,1fr)}.layout>section.panel{padding:8px}.board{border-radius:8px;overscroll-behavior:contain;-webkit-user-select:none;user-select:none}.toolbar{gap:6px;margin-bottom:8px}
+@media(max-width:850px){body>header.workspace-header{margin:10px 8px 0}.top{padding:8px}.layout{padding:0 8px 8px;grid-template-columns:1fr}.layout>section.panel{order:0}.layout>aside{order:1}.board,.map-view .board{height:65dvh;min-height:340px}}
+
+.map-controls{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;margin-bottom:8px;padding:8px;border:1px solid #28444e;border-radius:10px;background:#0a1c23}.map-controls .tools{margin:0;gap:6px}.map-controls #instructions{flex-basis:100%;order:3;margin:0;font-size:12px}.map-controls button{padding:8px 11px;min-height:44px}.map-controls .map-edit-tools{margin-left:auto}.toolbar button{min-height:44px}
+@media(max-width:850px){.map-controls .map-edit-tools{margin-left:0}.map-controls{gap:8px}.toolbar span{flex-basis:100%}}
 </style></head><body class="map-view">
 <header class="workspace-header"><div class="brand"><img src="https://i.imgur.com/LtMzKj2.png" alt="Delta Force Logo"><div><div class="eyebrow" id="pageTitle">Map viewer</div><h1>DELTA FORCE</h1></div></div><nav class="workspace-nav" aria-label="Caster pages">
 <a href="index.html">Home</a><a data-page="operators" href="operator.html#operators">Operators</a><a data-page="builder" href="operator.html#team-builder">Team builder</a><a data-page="maps" href="map.html#map-view">Map viewer</a><a data-page="plotter" href="map.html#plotter">Rotation plotter</a>
 </nav></header>
 <section class="top"><label>Game mode<select id="mode"><option value="operations">Operations</option><option value="warfare">Warfare</option><option value="detonation">Detonation</option></select></label><label>Map<select id="map"></select></label><label class="plotter-only">Add screenshot map<input id="newMapName" maxlength="50" placeholder="Map name"><button id="addMap">+ Add map</button></label><label class="plotter-only">Map / session name<input id="sessionName" maxlength="80" placeholder="e.g. Finals · Game 1"></label></section>
 <main class="layout"><aside class="panel plotter-only"><h2>Teams & routes</h2><div id="teams" class="teams"></div><button id="addTeam" style="width:100%;margin-top:10px">+ Add team</button>
-<div class="tools" aria-label="Drawing tools"><button data-tool="waypoint" class="active">Waypoints</button><button data-tool="trace">Trace</button><button data-tool="pan">Pan</button></div><p class="help" id="instructions">Tap the map to add numbered waypoints for the selected team.</p>
-<div class="tools"><button id="undo">Undo</button><button id="redo">Redo</button><button id="newLeg">New segment</button><button id="clearTeam">Clear team route</button></div>
 <label>Casting notes<textarea id="notes" placeholder="Timing, choke points, split routes…"></textarea></label>
 <div class="upload"><label>Use your map screenshot<input id="upload" type="file" accept="image/png,image/jpeg,image/webp"></label><button id="restoreMap">Restore bundled map</button></div><p class="help">Four Operations layouts are bundled. For Warfare, Detonation, or another layout, select Custom map and upload your overhead screenshot. Add named screenshot maps for any mode. Routes are saved separately for each map and mode on this browser.</p>
 <details><summary>Map sources & layouts</summary><p class="help">Zero Dam uses the existing reference asset. Layali Grove, Space City and Brakkesh use <a href="https://www.playdeltaforce.com/act/mapswiki/" target="_blank" rel="noopener">Team Jade / Level Infinite’s map tool</a> imagery. These reference layouts may differ from the current season. Upload the match map for exact alignment.</p></details></aside>
-<section class="panel"><div class="toolbar"><span id="mapTitle"></span><button id="zoomOut" aria-label="Zoom out">−</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="fit">Fit map</button><button id="exportPng" class="plotter-only">Save image</button></div><div id="board" class="board" aria-label="Map rotation drawing area"><div id="stage" class="stage"><img id="image" alt="Selected tactical map" draggable="false"><div id="blank" class="blank">Upload an overhead map screenshot to begin.</div><svg id="routes" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"></svg></div></div><p class="view-hint">Drag to pan and use + / − to zoom. Switch to Rotation plotter to draw team routes or add a map screenshot.</p><div id="legend" class="legend"></div><div id="status" class="status" role="status"></div><div class="tools plotter-only"><button id="exportJson">Export routes</button><button id="importBtn">Import routes</button><input id="importJson" type="file" accept="application/json,.json" hidden></div></section></main>
+<section class="panel"><div class="toolbar"><span id="mapTitle"></span><button id="zoomOut" aria-label="Zoom out">−</button><button id="zoomIn" aria-label="Zoom in">+</button><button id="fill">Fill view</button><button id="fit">Fit whole map</button><button id="exportPng" class="plotter-only">Save image</button></div><div class="plotter-only map-controls"><div class="tools map-draw-tools" aria-label="Drawing tools"><button data-tool="waypoint" class="active">Waypoints</button><button data-tool="trace">Trace</button><button data-tool="pan">Pan</button></div><p class="help" id="instructions">Tap to add numbered waypoints. Use two fingers to pan and pinch-zoom.</p>
+<div class="tools map-edit-tools"><button id="undo">Undo</button><button id="redo">Redo</button><button id="newLeg">New segment</button><button id="clearTeam">Clear team route</button></div>
+</div><div id="board" class="board" aria-label="Map rotation drawing area"><div id="stage" class="stage"><img id="image" alt="Selected tactical map" draggable="false"><div id="blank" class="blank">Upload an overhead map screenshot to begin.</div><svg id="routes" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"></svg></div></div><p class="view-hint">Drag to pan; pinch with two fingers to zoom and pan on iPad. Fill view removes side gaps; Fit whole map shows every edge. Switch to Rotation plotter to draw team routes.</p><div id="legend" class="legend"></div><div id="status" class="status" role="status"></div><div class="tools plotter-only"><button id="exportJson">Export routes</button><button id="importBtn">Import routes</button><input id="importJson" type="file" accept="application/json,.json" hidden></div></section></main>
 <script>
 'use strict';
 const $=id=>document.getElementById(id), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -57,8 +64,13 @@ function renderRoutes(){
  $('legend').innerHTML=doc.teams.map(t=>`<span><i class="key" style="background:${t.color}"></i>${esc(t.name)}${t.id===doc.active?' · plotting':''}</span>`).join('');buttons();
 }
 function transform(){$('stage').style.transform=`translate(${pan.x}px,${pan.y}px) scale(${zoom})`}
-function fit(){zoom=Math.min($('board').clientWidth/1000,$('board').clientHeight/height)*.96;pan={x:($('board').clientWidth-1000*zoom)/2,y:($('board').clientHeight-height*zoom)/2};transform()}
-function loadImage(){ready=false;const src=doc.customImage||(customMap()?'':`assets/img/map/op/${map}.webp`);$('image').hidden=!src;$('blank').hidden=!!src;height=1000;$('stage').style.height='1000px';renderRoutes();fit();if(!src){tell('Upload a map screenshot to start plotting.');return}const image=$('image');image.onload=()=>{ready=true;height=1000*image.naturalHeight/image.naturalWidth;$('stage').style.height=height+'px';renderRoutes();fit()};image.onerror=()=>{ready=false;image.hidden=true;$('blank').hidden=false;tell('Map image unavailable. Upload an overhead screenshot.')};image.src=src;}
+let viewSizing='fill';
+function sizeMap(sizing=viewSizing){viewSizing=sizing;const ratios=[$('board').clientWidth/1000,$('board').clientHeight/height];zoom=(sizing==='fill'?Math.max(...ratios):Math.min(...ratios));pan={x:($('board').clientWidth-1000*zoom)/2,y:($('board').clientHeight-height*zoom)/2};transform()}
+function fit(){sizeMap('fit')}
+function fill(){sizeMap('fill')}
+function resizeMap(){sizeMap()}
+
+function loadImage(){ready=false;const src=doc.customImage||(customMap()?'':`assets/img/map/op/${map}.webp`);$('image').hidden=!src;$('blank').hidden=!!src;height=1000;$('stage').style.height='1000px';renderRoutes();resizeMap();if(!src){tell('Upload a map screenshot to start plotting.');return}const image=$('image');image.onload=()=>{ready=true;height=1000*image.naturalHeight/image.naturalWidth;$('stage').style.height=height+'px';renderRoutes();resizeMap()};image.onerror=()=>{ready=false;image.hidden=true;$('blank').hidden=false;tell('Map image unavailable. Upload an overhead screenshot.')};image.src=src;}
 function load(){doc=saved[key()]||fresh();history=[];future=[];$('sessionName').value=doc.title;$('notes').value=doc.notes;$('mapTitle').textContent=`${$('mode').selectedOptions[0].text} · ${$('map').selectedOptions[0].text}`;renderTeams();loadImage()}
 function populateMaps(){const extras=Object.keys(saved).filter(k=>k.startsWith(mode+'/custom-')).map(k=>[k.split('/')[1],saved[k].mapName||'Screenshot map']);const list=[...(mode==='operations'?MAPS:[]),...extras,['custom','Custom map / screenshot']];$('map').innerHTML=list.map(([id,n])=>`<option value="${id}">${n}</option>`).join('');map=list[0][0];load()}
 function world(e){const r=$('board').getBoundingClientRect();return {x:(e.clientX-r.left-pan.x)/zoom/1000,y:(e.clientY-r.top-pan.y)/zoom/height}}
@@ -70,13 +82,42 @@ $('sessionName').oninput=e=>{doc.title=e.target.value;persist()};$('notes').onin
 $('teams').onclick=e=>{const select=e.target.dataset.select,remove=e.target.dataset.remove;if(select){doc.active=select;renderTeams();renderRoutes();persist()}if(remove&&doc.teams.length>1){checkpoint();doc.teams=doc.teams.filter(t=>t.id!==remove);if(doc.active===remove)doc.active=doc.teams[0].id;renderTeams();renderRoutes();persist()}};
 $('teams').oninput=e=>{const row=e.target.closest('[data-id]');if(!row)return;const t=doc.teams.find(t=>t.id===row.dataset.id);if(e.target.type==='color')t.color=e.target.value;if(e.target.type==='text')t.name=e.target.value;renderRoutes();persist()};
 $('addTeam').onclick=()=>{if(doc.teams.length>=24)return;checkpoint();const t=makeTeam(doc.teams.length);doc.teams.push(t);doc.active=t.id;renderTeams();renderRoutes();persist()};
-document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));$('board').style.cursor=tool==='pan'?'grab':'crosshair';$('instructions').textContent=tool==='trace'?'Drag a continuous rotation route. Each stroke is a separate segment.':tool==='pan'?'Drag to move the map. Use + / − or the mouse wheel to zoom.':'Tap the map to add numbered waypoints for the selected team.'});
-$('board').onpointerdown=e=>{if(e.button!==0)return;if(tool!=='pan'&&!ready){tell('Upload or load a map before plotting.');return}e.preventDefault();$('board').setPointerCapture(e.pointerId);gesture={id:e.pointerId,startX:e.clientX,startY:e.clientY,pan:{...pan},tool};if(tool==='trace'){const p=world(e);if(!inside(p)){gesture=null;return}checkpoint();team().segments.push([]);drawPoint({...p,trace:true})}};
-$('board').onpointermove=e=>{if(!gesture||gesture.id!==e.pointerId)return;if(gesture.tool==='pan'){pan={x:gesture.pan.x+e.clientX-gesture.startX,y:gesture.pan.y+e.clientY-gesture.startY};transform()}if(gesture.tool==='trace'){const p=world(e),s=team().segments.at(-1),last=s.at(-1);if(!inside(p)){gesture.break=true;return}if(gesture.break){team().segments.push([]);gesture.break=false}if(!last||Math.hypot((p.x-last.x)*1000,(p.y-last.y)*height)>5)drawPoint({...p,trace:true})}};
-function end(e,cancel=false){if(!gesture||gesture.id!==e.pointerId)return;const g=gesture;gesture=null;if(g.tool==='waypoint'&&!cancel&&Math.hypot(e.clientX-g.startX,e.clientY-g.startY)<10){const p=world(e);if(inside(p)){checkpoint();drawPoint(p)}}if(g.tool==='trace'&&cancel){doc=JSON.parse(history.pop());}renderTeams();renderRoutes();persist()}
-$('board').onpointerup=e=>end(e);$('board').onpointercancel=e=>end(e,true);
+document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));$('board').style.cursor=tool==='pan'?'grab':'crosshair';$('instructions').textContent=tool==='trace'?'Drag one finger to trace a route. Use two fingers to pan and pinch-zoom.':tool==='pan'?'Drag to pan. Pinch with two fingers to zoom and pan on iPad.':'Tap to add numbered waypoints. Use two fingers to pan and pinch-zoom.'});
+// Track contacts separately from drawing so a pinch never creates a route.
+const contacts=new Map();let pinch=null,suppressDrawing=false;
+function pinchFrame(){const [a,b]=[...contacts.values()];const r=$('board').getBoundingClientRect();return {x:(a.x+b.x)/2-r.left,y:(a.y+b.y)/2-r.top,d:Math.max(1,Math.hypot(a.x-b.x,a.y-b.y))}}
+function beginPinch(){
+ if(gesture?.tool==='trace'&&gesture.before){doc=JSON.parse(gesture.before);history=gesture.historyBefore;future=gesture.future;renderTeams();renderRoutes();}
+ gesture=null;suppressDrawing=true;
+ const f=pinchFrame();pinch={...f,zoom,worldX:(f.x-pan.x)/zoom,worldY:(f.y-pan.y)/zoom};
+}
+$('board').onpointerdown=e=>{
+ if(e.button!==0)return;e.preventDefault();
+ contacts.set(e.pointerId,{x:e.clientX,y:e.clientY});$('board').setPointerCapture(e.pointerId);
+ if(contacts.size>=2){beginPinch();return}
+ if(suppressDrawing)return;
+ if(tool!=='pan'&&!ready){tell('Upload or load a map before plotting.');return}
+ gesture={id:e.pointerId,startX:e.clientX,startY:e.clientY,pan:{...pan},tool};
+ if(tool==='trace'){const p=world(e);if(!inside(p)){gesture=null;return}Object.assign(gesture,{before:JSON.stringify(doc),historyBefore:[...history],future:[...future]});checkpoint();team().segments.push([]);drawPoint({...p,trace:true})}
+};
+$('board').onpointermove=e=>{
+ if(!contacts.has(e.pointerId))return;e.preventDefault();contacts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pinch&&contacts.size>=2){const f=pinchFrame();zoom=Math.max(.02,Math.min(8,pinch.zoom*f.d/pinch.d));pan={x:f.x-pinch.worldX*zoom,y:f.y-pinch.worldY*zoom};transform();return}
+ if(suppressDrawing||!gesture||gesture.id!==e.pointerId)return;
+ if(gesture.tool==='pan'){pan={x:gesture.pan.x+e.clientX-gesture.startX,y:gesture.pan.y+e.clientY-gesture.startY};transform()}
+ if(gesture.tool==='trace'){const p=world(e),s=team().segments.at(-1),last=s.at(-1);if(!inside(p)){gesture.break=true;return}if(gesture.break){team().segments.push([]);gesture.break=false}if(!last||Math.hypot((p.x-last.x)*1000,(p.y-last.y)*height)>5)drawPoint({...p,trace:true})}
+};
+function end(e,cancel=false){
+ if(!contacts.has(e.pointerId))return;contacts.delete(e.pointerId);
+ if(suppressDrawing){if(contacts.size>=2)beginPinch();else pinch=null;if(!contacts.size)suppressDrawing=false;return}
+ if(!gesture||gesture.id!==e.pointerId)return;const g=gesture;gesture=null;
+ if(g.tool==='waypoint'&&!cancel&&Math.hypot(e.clientX-g.startX,e.clientY-g.startY)<10){const p=world(e);if(inside(p)){checkpoint();drawPoint(p)}}
+ if(g.tool==='trace'&&cancel&&g.before){doc=JSON.parse(g.before);history=g.historyBefore;future=g.future}
+ renderTeams();renderRoutes();persist();
+}
+$('board').onpointerup=e=>end(e);$('board').onpointercancel=e=>end(e,true);$('board').onlostpointercapture=e=>end(e,true);
 function zoomBy(f){const cx=$('board').clientWidth/2,cy=$('board').clientHeight/2,next=Math.max(.08,Math.min(8,zoom*f));pan={x:cx-(cx-pan.x)*next/zoom,y:cy-(cy-pan.y)*next/zoom};zoom=next;transform()}
-$('board').addEventListener('wheel',e=>{e.preventDefault();zoomBy(e.deltaY<0?1.15:1/1.15)},{passive:false});$('zoomIn').onclick=()=>zoomBy(1.3);$('zoomOut').onclick=()=>zoomBy(1/1.3);$('fit').onclick=fit;window.addEventListener('resize',fit);
+$('board').addEventListener('wheel',e=>{e.preventDefault();zoomBy(e.deltaY<0?1.15:1/1.15)},{passive:false});$('zoomIn').onclick=()=>zoomBy(1.3);$('zoomOut').onclick=()=>zoomBy(1/1.3);$('fit').onclick=fit;$('fill').onclick=fill;window.addEventListener('resize',resizeMap);
 $('undo').onclick=()=>{if(!history.length)return;future.push(JSON.stringify(doc));doc=JSON.parse(history.pop());renderTeams();renderRoutes();persist()};$('redo').onclick=()=>{if(!future.length)return;history.push(JSON.stringify(doc));doc=JSON.parse(future.pop());renderTeams();renderRoutes();persist()};
 $('newLeg').onclick=()=>{if(!team().segments.at(-1)?.length)return;checkpoint();team().segments.push([]);renderRoutes();persist();tell('Next point starts a separate segment.')};$('clearTeam').onclick=()=>{checkpoint();team().segments=[];renderTeams();renderRoutes();persist()};
 $('upload').onchange=async e=>{const file=e.target.files[0];if(!file)return;const token=key();try{const bitmap=await createImageBitmap(file),c=document.createElement('canvas'),s=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));c.width=Math.round(bitmap.width*s);c.height=Math.round(bitmap.height*s);c.getContext('2d').drawImage(bitmap,0,0,c.width,c.height);bitmap.close();if(key()!==token)return;doc.customImage=c.toDataURL('image/jpeg',.86);doc.teams.forEach(t=>t.segments=[]);history=[];future=[];persist();renderTeams();loadImage()}catch{tell('Could not open this image. Use PNG, JPEG or WebP.')}e.target.value=''};
@@ -101,8 +142,8 @@ function setMapView(){
  document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool));
  $('board').style.cursor=plotting?'crosshair':'grab';
  $('board').setAttribute('aria-label',plotting?'Map rotation drawing area':'Tactical map view');
- $('instructions').textContent='Tap the map to add numbered waypoints for the selected team.';
- fit();
+ $('instructions').textContent='Tap to add numbered waypoints. Use two fingers to pan and pinch-zoom.';
+ resizeMap();
 }
 window.addEventListener('hashchange',setMapView);
 populateMaps();setMapView();
